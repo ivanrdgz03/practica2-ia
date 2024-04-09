@@ -4,6 +4,7 @@
 #include "comportamientos/comportamiento.hpp"
 
 #include <list>
+#include <algorithm>
 
 struct stateN0{
   ubicacion jugador;
@@ -24,14 +25,17 @@ struct nodeN0{
   }
 
   bool operator<(const nodeN0& other) const{
-    return ((st.jugador.f < other.st.jugador.f)||(st.jugador.f == other.st.jugador.f && st.jugador.c < other.st.jugador.c));
+    return ((st.jugador.f < other.st.jugador.f)||
+    (st.jugador.f == other.st.jugador.f && st.jugador.c < other.st.jugador.c)||
+    (st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c &&
+    st.jugador.brujula < other.st.jugador.brujula));
   }
 };
 
 class ComportamientoJugador : public Comportamiento {
   public:
     ComportamientoJugador(unsigned int size) : Comportamiento(size) {
-      // Inicializar Variables de Estado
+      // Constructor nivel 4???
     }
     ComportamientoJugador(std::vector< std::vector< unsigned char> > mapaR) : Comportamiento(mapaR) {
       hayPlan = false;
@@ -55,9 +59,16 @@ class ComportamientoJugador : public Comportamiento {
     list<Action> plan;
     nodeN0 current_state;
 
+    bool Find(const stateN0& state, const list<nodeN0>& lista) const;
+    void visualizarPlan(const stateN0& st, const list<Action>& plan);
+    void reseteoMatriz(vector<vector<unsigned char>>& matriz);
+    bool casillaTransitable(const ubicacion& u) const;
     stateN0 applyAction(const stateN0& state, const Action& accion) const;
-    bool busquedaN0(const Sensores& sensores);
+    bool busquedaN0(const stateN0& inicio, const ubicacion& final, const vector<vector<unsigned char>>& mapa);
     Action nivel0(const Sensores& sensores);
+
+    bool busquedaN1(const stateN0& inicio, const ubicacion& final, const vector<vector<unsigned char>>& mapa);
+    Action nivel1(const Sensores& sensores);
 
 
 

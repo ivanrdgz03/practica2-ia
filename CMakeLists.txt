@@ -1,9 +1,21 @@
 cmake_minimum_required(VERSION 3.2)
 
+# mgo - haz que se muestren los comandos que se ejecutan
+set(CMAKE_VERBOSE_MAKEFILE on)
 
-# problema OpenGL
-OpenGL
+## ------------------------ mgo ------------------
+include(CMakePrintHelpers)
+
+#Lo añadí porque me daba error la configuración de la biblioteca OpenGL
+# Configurar OpenGL_GL_PREFERENCE antes de encontrar OpenGL
 set(OpenGL_GL_PREFERENCE "GLVND")
+
+project(Motor_Grafico_Belkan)
+
+# problema deteccion librerias glut - mgo -------
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/lib/x86_64-linux-gnu -lglut")
+set(CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu/libglut")
+
 project(Motor_Grafico_Belkan)
 
 # problema deteccion librerias glut - mgo -------
