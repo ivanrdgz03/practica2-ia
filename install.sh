@@ -25,12 +25,12 @@ do
                 ;;
             dnf)
                 sudo dnf install -y freeglut-devel libjpeg-turbo-devel openmpi-devel libXmu-devel libXi-devel cmake boost-devel
-                sed -i '62s/.*/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -lglut")/' CMakeLists.txt
+                #sed -i '62s/.*/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -lglut")/' CMakeLists.txt
                 done=1
                 ;;
             pacman)
                 sudo pacman -Sy freeglut libjpeg openmpi openmpi libxmu libxi boost cmake
-                sed -i '62s/.*/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -lglut")/' CMakeLists.txt
+                #sed -i '62s/.*/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -lglut")/' CMakeLists.txt
                 done=1
                 ;;
             *)
@@ -54,11 +54,11 @@ Tenga en cuenta que el nombre de las librerías puede variar dependiendo de la d
 
     if [ $done -eq 1 ]; then
         ## Creamos el makefile para nuestra máquina
-        cmake -DCMAKE_BUILD_TYPE=Debug .      # con el flag de depuración activo
+        #cmake -DCMAKE_BUILD_TYPE=Debug .      # con el flag de depuración activo
         # cmake -DCMAKE_BUILD_TYPE=Release .   # sin información de depuración
 
         ## Compilamos!
-        make
+        #make
 
         if [ $? -eq 0 ]; then
             printf "${GREEN} >>> INSTALACIÓN Y COMPILACIÓN CORRECTA \n"
