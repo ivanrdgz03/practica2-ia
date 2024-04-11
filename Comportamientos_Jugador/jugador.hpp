@@ -25,10 +25,17 @@ struct nodeN0{
   }
 
   bool operator<(const nodeN0& other) const{
-    return ((st.jugador.f < other.st.jugador.f)||
+    if(st.jugador.f < other.st.jugador.f) return true;
+    else if (st.jugador.f == other.st.jugador.f && st.jugador.c < other.st.jugador.c) return true;
+    else if(st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula < other.st.jugador.brujula) return true;
+    else if(st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.colaborador.f < other.st.colaborador.f) return true;
+    else if((st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.colaborador.f == other.st.colaborador.f && st.colaborador.c < other.st.colaborador.c)) return true;
+    else if((st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.colaborador.f == other.st.colaborador.f && st.colaborador.c == other.st.colaborador.c && st.colaborador.brujula < other.st.colaborador.brujula)) return true;
+    return false;
+    /*return ((st.jugador.f < other.st.jugador.f)||
     (st.jugador.f == other.st.jugador.f && st.jugador.c < other.st.jugador.c)||
     (st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c &&
-    st.jugador.brujula < other.st.jugador.brujula));
+    st.jugador.brujula < other.st.jugador.brujula) );*/
   }
 };
 
@@ -55,6 +62,42 @@ class ComportamientoJugador : public Comportamiento {
 
 
   private:
+const vector <pair<int, int>> sensores_norte = {{0,  0},
+                                                    {-1, -1},
+                                                    {-1, 0},
+                                                    {-1, 1},
+                                                    {-2, -2},
+                                                    {-2, -1},
+                                                    {-2, 0},
+                                                    {-2, 1},
+                                                    {-2, 2},
+                                                    {-3, -3},
+                                                    {-3, -2},
+                                                    {-3, -1},
+                                                    {-3, 0},
+                                                    {-3, 1},
+                                                    {-3, 2},
+                                                    {-3, 3}};
+const vector <pair<int, int>> sensores_noreste = {{0,  0},
+                                                      {-1, 0},
+                                                      {-1, 1},
+                                                      {0,  1},
+                                                      {-2, 0},
+                                                      {-2, 1},
+                                                      {-2, 2},
+                                                      {-1, 2},
+                                                      {0,  2},
+                                                      {-3, 0},
+                                                      {-3, 1},
+                                                      {-3, 2},
+                                                      {-3, 3},
+                                                      {-2, 3},
+                                                      {-1, 3},
+                                                      {0,  3}};
+
+
+
+
     bool hayPlan;
     list<Action> plan;
     nodeN0 current_state;
@@ -67,7 +110,9 @@ class ComportamientoJugador : public Comportamiento {
     bool busquedaN0(const stateN0& inicio, const ubicacion& final, const vector<vector<unsigned char>>& mapa);
     Action nivel0(const Sensores& sensores);
 
-    bool busquedaN1(const stateN0& inicio, const ubicacion& final, const vector<vector<unsigned char>>& mapa);
+    ubicacion obtener_coordenadas(const ubicacion& u, const unsigned int &pos) const;
+    bool colaboradorEnSensor(const stateN0& st, const Sensores& sensores) const;
+    bool busquedaN1(const stateN0& inicio, const ubicacion& final, const vector<vector<unsigned char>>& mapa, const Sensores& sensores);
     Action nivel1(const Sensores& sensores);
 
 

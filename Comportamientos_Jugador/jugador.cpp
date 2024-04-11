@@ -284,7 +284,51 @@ bool ComportamientoJugador::busquedaN0(const stateN0 &inicio, const ubicacion &f
 	return solutionFound;
 }
 
-bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa){
+ubicacion ComportamientoJugador::obtener_coordenadas(const ubicacion& u, const unsigned int &pos) const{
+    ubicacion salida;
+    switch (u.brujula) {
+        case norte:
+            salida = {u.f + sensores_norte[pos].first, u.c + sensores_norte[pos].second, u.brujula};
+            break;
+        case sur:
+            salida = {u.f - sensores_norte[pos].first, u.c - sensores_norte[pos].second, u.brujula};
+            break;
+        case este:
+            salida = {u.f + sensores_norte[pos].second, u.c - sensores_norte[pos].first, u.brujula};
+            break;
+        case oeste:
+            salida = {u.f - sensores_norte[pos].second, u.c + sensores_norte[pos].first, u.brujula};
+            break;
+        case noreste:
+            salida = {u.f + sensores_noreste[pos].first,
+                        u.c + sensores_noreste[pos].second, u.brujula};
+            break;
+        case noroeste:
+            salida = {u.f - sensores_noreste[pos].second,
+                        u.c + sensores_noreste[pos].first, u.brujula};
+            break;
+        case sureste:
+            salida = {u.f + sensores_noreste[pos].second,
+                        u.c - sensores_noreste[pos].first, u.brujula};
+            break;
+        case suroeste:
+            salida = {u.f - sensores_noreste[pos].first,
+                        u.c - sensores_noreste[pos].second, u.brujula};
+            break;
+    }
+    return salida;
+}
+
+bool ComportamientoJugador::colaboradorEnSensor(const stateN0& st, const Sensores& sensores) const{
+	for(int i = 1;i < sensores.agentes.size();i++)
+		if(obtener_coordenadas(st.jugador, i).f == st.colaborador.f && obtener_coordenadas(st.jugador, i).c == st.colaborador.c)
+			return true;
+
+	return false;
+}
+
+
+bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores& sensores){
 	nodeN0 currentNode;
 	currentNode.st = current_state.st;
 	list<nodeN0> frontier;
@@ -303,13 +347,7 @@ bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &f
 		child_walk.st = applyAction(currentNode.st, actWALK);
 		child_walk.secuencia.push_back(actWALK);
 
-		if (child_walk.st.colaborador.f == final.f && child_walk.st.colaborador.c == final.c)
-		{
-			currentNode = child_walk;
-			solutionFound = true;
-		}
-		
-		else if (explored.find(child_walk) == explored.end())
+		if (explored.find(child_walk) == explored.end())
 			frontier.push_back(child_walk);
 
 		if (!solutionFound)
@@ -317,12 +355,7 @@ bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &f
 			nodeN0 child_run = currentNode;
 			child_run.st = applyAction(currentNode.st, actRUN);
 			child_run.secuencia.push_back(actRUN);
-			if (child_run.st.colaborador.f == final.f && child_run.st.colaborador.c == final.c)
-			{
-				currentNode = child_run;
-				solutionFound = true;
-			}
-			else if(explored.find(child_run) == explored.end())
+			if(explored.find(child_run) == explored.end())
 				frontier.push_back(child_run);
 		}
 		if (!solutionFound)
@@ -339,6 +372,35 @@ bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &f
 
 			if (explored.find(child_turn_l) == explored.end())
 				frontier.push_back(child_turn_l);
+		}
+
+		if(colaboradorEnSensor(currentNode.st,sensores)){
+			nodeN0 child_clb_walk = currentNode;
+			child_clb_walk.st = applyAction(currentNode.st, act_CLB_WALK);
+			child_clb_walk.secuencia.push_back(act_CLB_WALK);
+
+			if (child_clb_walk.st.colaborador.f == final.f && child_clb_walk.st.colaborador.c == final.c)
+			{
+				currentNode = child_clb_walk;
+				solutionFound = true;
+			}
+			else if (explored.find(child_clb_walk) == explored.end())
+				frontier.push_back(child_clb_walk);
+
+			if (!solutionFound){
+				nodeN0 child_clb_turn_sr = currentNode, child_clb_turn_l = currentNode;
+				child_clb_turn_sr.st = applyAction(currentNode.st, act_CLB_TURN_SR);
+				child_clb_turn_sr.secuencia.push_back(act_CLB_TURN_SR);
+
+				if (explored.find(child_clb_turn_sr) == explored.end())
+					frontier.push_back(child_clb_turn_sr);
+
+				child_clb_turn_l.st = applyAction(currentNode.st, act_CLB_TURN_SR);
+				child_clb_turn_l.secuencia.push_back(act_CLB_TURN_SR);
+
+				if (explored.find(child_clb_turn_l) == explored.end())
+					frontier.push_back(child_clb_turn_l);
+			}
 		}
 		if (!solutionFound && !frontier.empty())
 		{
@@ -371,12 +433,12 @@ Action ComportamientoJugador::nivel1(const Sensores &sensores)
 	current_state.st.colaborador.c = sensores.CLBposC;
 	current_state.st.colaborador.brujula = sensores.CLBsentido;
 
-	if (hayPlan && !plan.empty())
+	if (!plan.empty())
 	{
 		accion = plan.front();
 		plan.pop_front();
 	}
-	else if (busquedaN1(current_state.st, {sensores.destinoF, sensores.destinoC}, mapaResultado))
+	else if (busquedaN1(current_state.st, {sensores.destinoF, sensores.destinoC}, mapaResultado, sensores))
 	{
 		if (!plan.empty())
 		{
