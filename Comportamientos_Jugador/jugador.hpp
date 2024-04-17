@@ -26,16 +26,12 @@ struct nodeN0{
 
   bool operator<(const nodeN0& other) const{
     if(st.jugador.f < other.st.jugador.f) return true;
-    else if (st.jugador.f == other.st.jugador.f && st.jugador.c < other.st.jugador.c) return true;
+    else if(st.jugador.f == other.st.jugador.f && st.jugador.c < other.st.jugador.c) return true;
     else if(st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula < other.st.jugador.brujula) return true;
-    else if(st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.colaborador.f < other.st.colaborador.f) return true;
-    else if((st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.colaborador.f == other.st.colaborador.f && st.colaborador.c < other.st.colaborador.c)) return true;
-    else if((st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.colaborador.f == other.st.colaborador.f && st.colaborador.c == other.st.colaborador.c && st.colaborador.brujula < other.st.colaborador.brujula)) return true;
-    return false;
-    /*return ((st.jugador.f < other.st.jugador.f)||
-    (st.jugador.f == other.st.jugador.f && st.jugador.c < other.st.jugador.c)||
-    (st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c &&
-    st.jugador.brujula < other.st.jugador.brujula) );*/
+    else if(st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula == other.st.jugador.brujula && st.colaborador.f < other.st.colaborador.f) return true;
+    else if(st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula == other.st.jugador.brujula && st.colaborador.f == other.st.colaborador.f && st.colaborador.c < other.st.colaborador.c) return true;
+    else if(st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula == other.st.jugador.brujula && st.colaborador.f == other.st.colaborador.f && st.colaborador.c == other.st.colaborador.c && st.colaborador.brujula < other.st.colaborador.brujula) return true;
+    else return false;
   }
 };
 
