@@ -58,7 +58,7 @@ private:
   int muertes_innecesarias = 0;
 
   // bateria
-  int bateria = 5000;
+  int bateria = 3000;
 
   bool hitbox = true;
   int desactivado = 0;

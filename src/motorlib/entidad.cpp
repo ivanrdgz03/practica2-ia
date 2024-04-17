@@ -3,7 +3,7 @@
 void Entidad::resetEntidad()
 {
   hitbox = false;
-  if (tipo == jugador)
+  if (tipo == jugador or subtipo == colaborador)
   {
     desactivado = 0;
   }

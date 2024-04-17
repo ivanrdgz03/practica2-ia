@@ -72,12 +72,12 @@ int main(int argc, char **argv)
       }
     }
 
-    // Reviso si es una posicion valida del sonambulo
+    // Reviso si es una posicion valida del colaborador
     if (atoi(argv[7]) != -1)
     {
       if (mapAux[atoi(argv[7])][atoi(argv[8])] == 'P' or mapAux[atoi(argv[7])][atoi(argv[8])] == 'M')
       {
-        cout << "Posicion (" << argv[7] << "," << argv[8] << ") no es de tipo válido para el jugador" << endl;
+        cout << "Posicion (" << argv[7] << "," << argv[8] << ") no es de tipo válido para el colaborador" << endl;
         return 0;
       }
     }

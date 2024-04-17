@@ -369,11 +369,6 @@ bool actuacionNPC(unsigned int entidad, unsigned char celda, Action accion, unsi
     switch (accion)
     {
     case act_CLB_STOP:
-      if (celda == 'X')
-      { // Casilla Rosa (Recarga)
-        monitor.get_entidad(0)->increaseBateria(10);
-      }
-
       out = true;
       break;
 
@@ -495,6 +490,7 @@ bool actuacionNPC(unsigned int entidad, unsigned char celda, Action accion, unsi
           monitor.get_entidad(1)->Cogio_Bikini(false);
           monitor.get_entidad(1)->Cogio_Zapatillas(false);
           monitor.get_entidad(1)->setLastAction(act_CLB_STOP);
+          monitor.get_entidad(1)->SetLlegoOn();
 
           // Opcion simplemente choca contra el lobo
           monitor.get_entidad(0)->perderPV(1);
