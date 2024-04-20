@@ -12,7 +12,7 @@ struct stateN0{
   Action ultimaAccionColaborador;
 
   bool operator==(const stateN0& other) const{
-    return jugador == other.jugador && colaborador == other.colaborador;
+    return (jugador == other.jugador && colaborador == other.colaborador);
   }
 };
 
@@ -21,7 +21,7 @@ struct nodeN0{
   list<Action> secuencia;
 
   bool operator==(const nodeN0& other) const{
-    return st == other.st;
+    return (st == other.st);
   }
 
   bool operator<(const nodeN0& other) const{
