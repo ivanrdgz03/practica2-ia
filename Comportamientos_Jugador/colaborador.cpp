@@ -5,17 +5,20 @@
 Action ComportamientoColaborador::think(Sensores sensores) {
   Action accion;
 
-  if (sensores.ActionSent == actIDLE)
+  if (sensores.ActionSent == actIDLE){
     accion = last_action;
+    if (sensores.CLBgoal)
+    {
+      last_action = act_CLB_STOP;
+      accion = act_CLB_STOP;
+    }
+  }
   else {
     last_action = sensores.ActionSent;
     accion = sensores.ActionSent;
   }
 
-  if (sensores.CLBgoal){
-    last_action = act_CLB_STOP;
-    accion = act_CLB_STOP;
-  }
+  
   return accion;
 
 }

@@ -125,7 +125,7 @@ public:
   void PintaEstadoMonitor();
   double CoincidenciaConElMapa();
   string toString();
-  void init_casillas_especiales(unsigned int f, unsigned int c);
+  void init_casillas_especiales(unsigned int f, unsigned int c, unsigned int fcolab, unsigned int ccolab);
 
 };
 #endif

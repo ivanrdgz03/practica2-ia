@@ -146,7 +146,7 @@ Action Entidad::think(int acc, vector<vector<unsigned char>> vision, int level)
         }
         else
         {
-          misiones += 4;
+          misiones += 10;
           completoLosObjetivos = false;
         }
       }
@@ -431,13 +431,13 @@ int Entidad::fixBateria_sig_accion_colaborador(unsigned char celdaColaborador, A
     switch (celdaColaborador)
     {
     case 'A':
-      if (Has_Bikini()) // Bikini
+      if (EntidadColaborador->Has_Bikini()) // Bikini
         bateria_sig_accion_clb = 10;
       else
         bateria_sig_accion_clb = 100;
       break;
     case 'B':
-      if (Has_Zapatillas()) // Zapatillas
+      if (EntidadColaborador->Has_Zapatillas()) // Zapatillas
         bateria_sig_accion_clb = 15;
       else
         bateria_sig_accion_clb = 50;
@@ -454,13 +454,13 @@ int Entidad::fixBateria_sig_accion_colaborador(unsigned char celdaColaborador, A
     switch (celdaColaborador)
     {
     case 'A':
-      if (Has_Bikini()) // Bikini
+      if (EntidadColaborador->Has_Bikini()) // Bikini
         bateria_sig_accion_clb = 2;
       else
         bateria_sig_accion_clb = 10;
       break;
     case 'B':
-      if (Has_Zapatillas()) // Zapatillas
+      if (EntidadColaborador->Has_Zapatillas()) // Zapatillas
         bateria_sig_accion_clb = 1;
       else
         bateria_sig_accion_clb = 5;
