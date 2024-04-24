@@ -6,18 +6,18 @@
 #include <set>
 #include <stack>
 
-bool ComportamientoJugador::Find(const stateN0 &state, const list<nodeN0> &lista) const
+bool ComportamientoJugador::Find(const state &state, const list<node> &lista) const
 {
-	for (const nodeN0 &n : lista)
+	for (const node &n : lista)
 		if (n.st == state)
 			return true;
 	return false;
 }
 
-void ComportamientoJugador::visualizarPlan(const stateN0 &st, const list<Action> &plan)
+void ComportamientoJugador::visualizarPlan(const state &st, const list<Action> &plan)
 {
 	reseteoMatriz(mapaConPlan);
-	stateN0 cst = st;
+	state cst = st;
 
 	auto it = plan.begin();
 	while (it != plan.end())
@@ -79,9 +79,9 @@ bool ComportamientoJugador::casillaTransitable(const ubicacion &u) const
 	return mapaResultado[u.f][u.c] != 'M' && mapaResultado[u.f][u.c] != 'P';
 }
 
-stateN0 ComportamientoJugador::applyAction(const stateN0 &state, const Action &accion) const
+state ComportamientoJugador::applyAction(const state &st, const Action &accion) const
 {
-	stateN0 newState = state;
+	state newState = st;
 	switch (accion)
 	{
 	case actWALK:
@@ -202,25 +202,25 @@ stateN0 ComportamientoJugador::applyAction(const stateN0 &state, const Action &a
 	default:
 		throw("Acción no reconocida");
 	}
-	if (accion != act_CLB_STOP && accion != act_CLB_TURN_SR && accion != act_CLB_WALK && state.ultimaAccionColaborador != actIDLE)
-		newState = applyAction(newState, state.ultimaAccionColaborador);
-	if (accion == actRUN && ((applyAction(state, actWALK) == state) || !casillaTransitable(newState.jugador)))
-		newState = state;
+	if (accion != act_CLB_STOP && accion != act_CLB_TURN_SR && accion != act_CLB_WALK && st.ultimaAccionColaborador != actIDLE)
+		newState = applyAction(newState, st.ultimaAccionColaborador);
+	if (accion == actRUN && ((applyAction(st, actWALK) == st) || !casillaTransitable(newState.jugador)))
+		newState = st;
 	else if (accion == actWALK && !casillaTransitable(newState.jugador))
-		newState = state;
+		newState = st;
 	else if (accion == act_CLB_WALK && !casillaTransitable(newState.colaborador))
-		newState = state;
+		newState = st;
 	if (!casillaTransitable(newState.colaborador))
-		newState = state;
+		newState = st;
 	return newState;
 }
 
-bool ComportamientoJugador::busquedaN0(const stateN0 &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa)
+bool ComportamientoJugador::busquedaN0(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa)
 {
-	nodeN0 currentNode;
+	node currentNode;
 	currentNode.st = current_state.st;
-	list<nodeN0> frontier;
-	set<nodeN0> explored;
+	list<node> frontier;
+	set<node> explored;
 	bool solutionFound = (currentNode.st.jugador.f == final.f && currentNode.st.jugador.c == final.c);
 
 	frontier.push_back(currentNode);
@@ -230,7 +230,7 @@ bool ComportamientoJugador::busquedaN0(const stateN0 &inicio, const ubicacion &f
 		frontier.pop_front();
 		explored.insert(currentNode);
 
-		nodeN0 child_walk = currentNode;
+		node child_walk = currentNode;
 		child_walk.st = applyAction(currentNode.st, actWALK);
 		child_walk.secuencia.push_back(actWALK);
 
@@ -239,13 +239,12 @@ bool ComportamientoJugador::busquedaN0(const stateN0 &inicio, const ubicacion &f
 			currentNode = child_walk;
 			solutionFound = true;
 		}
-
-		else if (explored.find(child_walk) == explored.end())
+		if (!(child_walk == currentNode))
 			frontier.push_back(child_walk);
 
 		if (!solutionFound)
 		{
-			nodeN0 child_run = currentNode;
+			node child_run = currentNode;
 			child_run.st = applyAction(currentNode.st, actRUN);
 			child_run.secuencia.push_back(actRUN);
 			if (child_run.st.jugador.f == final.f && child_run.st.jugador.c == final.c)
@@ -253,23 +252,20 @@ bool ComportamientoJugador::busquedaN0(const stateN0 &inicio, const ubicacion &f
 				currentNode = child_run;
 				solutionFound = true;
 			}
-			else if (explored.find(child_run) == explored.end())
+			if (!(child_run == currentNode))
 				frontier.push_back(child_run);
 		}
 		if (!solutionFound)
 		{
-			nodeN0 child_turn_sr = currentNode, child_turn_l = currentNode;
+			node child_turn_sr = currentNode, child_turn_l = currentNode;
 			child_turn_sr.st = applyAction(currentNode.st, actTURN_SR);
 			child_turn_sr.secuencia.push_back(actTURN_SR);
-
-			if (explored.find(child_turn_sr) == explored.end())
-				frontier.push_back(child_turn_sr);
+			frontier.push_back(child_turn_sr);
 
 			child_turn_l.st = applyAction(currentNode.st, actTURN_L);
 			child_turn_l.secuencia.push_back(actTURN_L);
 
-			if (explored.find(child_turn_l) == explored.end())
-				frontier.push_back(child_turn_l);
+			frontier.push_back(child_turn_l);
 		}
 		if (!solutionFound && !frontier.empty())
 		{
@@ -327,7 +323,7 @@ ubicacion ComportamientoJugador::obtener_coordenadas(const ubicacion &u, const u
 	return salida;
 }
 
-bool ComportamientoJugador::colaboradorEnSensor(const stateN0 &st, const Sensores &sensores) const
+bool ComportamientoJugador::colaboradorEnSensor(const state &st, const Sensores &sensores) const
 {
 	for (int i = 1; i < sensores.agentes.size(); i++)
 		if (obtener_coordenadas(st.jugador, i).f == st.colaborador.f && obtener_coordenadas(st.jugador, i).c == st.colaborador.c)
@@ -336,12 +332,12 @@ bool ComportamientoJugador::colaboradorEnSensor(const stateN0 &st, const Sensore
 	return false;
 }
 
-bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores)
+bool ComportamientoJugador::busquedaN1(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores)
 {
-	nodeN0 currentNode;
+	node currentNode;
 	currentNode.st = current_state.st;
-	list<nodeN0> frontier;
-	set<nodeN0> explored;
+	list<node> frontier;
+	set<node> explored;
 	bool solutionFound = (currentNode.st.colaborador.f == final.f && currentNode.st.colaborador.c == final.c);
 
 	frontier.push_back(currentNode);
@@ -353,7 +349,7 @@ bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &f
 
 		if (colaboradorEnSensor(currentNode.st, sensores))
 		{
-			nodeN0 child_colab_walk = currentNode;
+			node child_colab_walk = currentNode;
 			child_colab_walk.st = applyAction(currentNode.st, act_CLB_WALK);
 			child_colab_walk.secuencia.push_back(act_CLB_WALK);
 			if (child_colab_walk.st.colaborador.f == final.f && child_colab_walk.st.colaborador.c == final.c)
@@ -361,29 +357,27 @@ bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &f
 				currentNode = child_colab_walk;
 				solutionFound = true;
 			}
-			else if (explored.find(child_colab_walk) == explored.end())
+			if (!(child_colab_walk == currentNode))
 				frontier.push_back(child_colab_walk);
 
 			if (!solutionFound)
 			{
-				nodeN0 child_colab_turn = currentNode;
+				node child_colab_turn = currentNode;
 				child_colab_turn.st = applyAction(currentNode.st, act_CLB_TURN_SR);
 				child_colab_turn.secuencia.push_back(act_CLB_TURN_SR);
-
-				if (explored.find(child_colab_turn) == explored.end())
+				if (!(child_colab_turn == currentNode))
 					frontier.push_back(child_colab_turn);
 
-				nodeN0 child_colab_stop = currentNode;
+				node child_colab_stop = currentNode;
 				child_colab_stop.st = applyAction(currentNode.st, act_CLB_STOP);
 				child_colab_stop.secuencia.push_back(act_CLB_STOP);
 
-				if (explored.find(child_colab_stop) == explored.end())
-					frontier.push_back(child_colab_stop);
+				frontier.push_back(child_colab_stop);
 			}
 		}
 		if (!solutionFound)
 		{
-			nodeN0 child_walk = currentNode;
+			node child_walk = currentNode;
 			child_walk.st = applyAction(currentNode.st, actWALK);
 			child_walk.secuencia.push_back(actWALK);
 
@@ -392,11 +386,10 @@ bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &f
 				currentNode = child_walk;
 				solutionFound = true;
 			}
-
-			else if (explored.find(child_walk) == explored.end())
+			if (!(child_walk == currentNode))
 				frontier.push_back(child_walk);
-		
-			nodeN0 child_run = currentNode;
+
+			node child_run = currentNode;
 			child_run.st = applyAction(currentNode.st, actRUN);
 			child_run.secuencia.push_back(actRUN);
 			if (child_run.st.colaborador.f == final.f && child_run.st.colaborador.c == final.c)
@@ -404,21 +397,19 @@ bool ComportamientoJugador::busquedaN1(const stateN0 &inicio, const ubicacion &f
 				currentNode = child_run;
 				solutionFound = true;
 			}
-			else if (explored.find(child_run) == explored.end())
+			if (!(child_run == currentNode))
 				frontier.push_back(child_run);
-		
-			nodeN0 child_turn_sr = currentNode, child_turn_l = currentNode;
+
+			node child_turn_sr = currentNode, child_turn_l = currentNode;
 			child_turn_sr.st = applyAction(currentNode.st, actTURN_SR);
 			child_turn_sr.secuencia.push_back(actTURN_SR);
 
-			if (explored.find(child_turn_sr) == explored.end())
-				frontier.push_back(child_turn_sr);
+			frontier.push_back(child_turn_sr);
 
 			child_turn_l.st = applyAction(currentNode.st, actTURN_L);
 			child_turn_l.secuencia.push_back(actTURN_L);
 
-			if (explored.find(child_turn_l) == explored.end())
-				frontier.push_back(child_turn_l);
+			frontier.push_back(child_turn_l);
 		}
 
 		if (!solutionFound && !frontier.empty())
@@ -463,6 +454,7 @@ Action ComportamientoJugador::nivel1(const Sensores &sensores)
 		{
 			accion = plan.front();
 			plan.pop_front();
+			hayPlan = true;
 		}
 	}
 	else
