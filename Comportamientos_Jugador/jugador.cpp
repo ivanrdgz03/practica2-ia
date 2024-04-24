@@ -212,6 +212,8 @@ state ComportamientoJugador::applyAction(const state &st, const Action &accion) 
 		newState = st;
 	if (!casillaTransitable(newState.colaborador))
 		newState = st;
+	if(newState.jugador.f == newState.colaborador.f && newState.jugador.c == newState.colaborador.c)
+		newState = st;
 	return newState;
 }
 
@@ -410,6 +412,12 @@ bool ComportamientoJugador::busquedaN1(const state &inicio, const ubicacion &fin
 			child_turn_l.secuencia.push_back(actTURN_L);
 
 			frontier.push_back(child_turn_l);
+
+			node child_idle = currentNode;
+			child_idle.st = applyAction(currentNode.st, actIDLE);
+			child_idle.secuencia.push_back(actIDLE);
+
+			frontier.push_back(child_idle);
 		}
 
 		if (!solutionFound && !frontier.empty())
@@ -457,8 +465,6 @@ Action ComportamientoJugador::nivel1(const Sensores &sensores)
 			hayPlan = true;
 		}
 	}
-	else
-		cout << "no se encontró el camino";
 
 	if (plan.empty())
 		hayPlan = false;
@@ -489,6 +495,7 @@ Action ComportamientoJugador::nivel0(const Sensores &sensores)
 		{
 			accion = plan.front();
 			plan.pop_front();
+			hayPlan = true;
 		}
 	}
 
