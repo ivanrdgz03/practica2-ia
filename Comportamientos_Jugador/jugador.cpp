@@ -212,7 +212,7 @@ state ComportamientoJugador::applyAction(const state &st, const Action &accion) 
 		newState = st;
 	if (!casillaTransitable(newState.colaborador))
 		newState = st;
-	if(newState.jugador.f == newState.colaborador.f && newState.jugador.c == newState.colaborador.c)
+	if (newState.jugador.f == newState.colaborador.f && newState.jugador.c == newState.colaborador.c)
 		newState = st;
 	return newState;
 }
@@ -282,9 +282,10 @@ bool ComportamientoJugador::busquedaN0(const state &inicio, const ubicacion &fin
 	}
 	if (solutionFound)
 	{
-		visualizarPlan(inicio, plan);
 		plan = currentNode.secuencia;
+		visualizarPlan(inicio, plan);
 	}
+
 	return solutionFound;
 }
 
@@ -433,8 +434,8 @@ bool ComportamientoJugador::busquedaN1(const state &inicio, const ubicacion &fin
 	}
 	if (solutionFound)
 	{
-		visualizarPlan(inicio, plan);
 		plan = currentNode.secuencia;
+		visualizarPlan(inicio, plan);
 	}
 	return solutionFound;
 }
@@ -460,6 +461,7 @@ Action ComportamientoJugador::nivel1(const Sensores &sensores)
 	{
 		if (!plan.empty())
 		{
+			cout << "Se realiza la planificacion con " << plan.size() << " movimientos" << endl;
 			accion = plan.front();
 			plan.pop_front();
 			hayPlan = true;
@@ -493,6 +495,7 @@ Action ComportamientoJugador::nivel0(const Sensores &sensores)
 	{
 		if (!plan.empty())
 		{
+			cout << "Se realiza la planificacion con " << plan.size() << " movimientos" << endl;
 			accion = plan.front();
 			plan.pop_front();
 			hayPlan = true;
