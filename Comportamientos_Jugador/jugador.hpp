@@ -5,10 +5,17 @@
 
 #include <list>
 #include <algorithm>
+#include <queue>
+
+struct objetos{
+  bool zapatillas;
+  bool bikini;
+};
 
 struct state{
   ubicacion jugador;
   ubicacion colaborador;
+  objetos objetos_jugador, objetos_colaborador;
   Action ultimaAccionColaborador;
 
   bool operator==(const state& other) const{
@@ -18,6 +25,7 @@ struct state{
 
 struct node{
   state st;
+  unsigned int coste;
   list<Action> secuencia;
 
   bool operator==(const node& other) const{
@@ -34,6 +42,12 @@ struct node{
     else return false;
   }
 };
+struct functor{
+  bool operator()(const node& a, const node& b) const{
+    return a.coste<b.coste;
+  }
+};
+
 
 class ComportamientoJugador : public Comportamiento {
   public:
@@ -47,7 +61,9 @@ class ComportamientoJugador : public Comportamiento {
       current_state.st.colaborador = {0,0};
       current_state.st.ultimaAccionColaborador = actIDLE;
       current_state.secuencia.clear();
-
+      current_state.coste = 0;
+      current_state.st.objetos_jugador = {false, false};
+      current_state.st.objetos_colaborador = {false, false};
 
     }
     ComportamientoJugador(const ComportamientoJugador & comport) : Comportamiento(comport){}
@@ -110,6 +126,15 @@ const vector <pair<int, int>> sensores_noreste = {{0,  0},
     bool colaboradorEnSensor(const state& st, const Sensores& sensores) const;
     bool busquedaN1(const state& inicio, const ubicacion& final, const vector<vector<unsigned char>>& mapa, const Sensores& sensores);
     Action nivel1(const Sensores& sensores);
+
+    Action nivel2(const Sensores& sensores);
+    bool busquedaN2(const state& inicio, const ubicacion& final, const vector<vector<unsigned char>>& mapa, const Sensores& sensores);
+    unsigned int calculoCoste(state& st, const Action& accion);
+
+    bool busquedaN3(const state& inicio, const ubicacion& final, const vector<vector<unsigned char>>& mapa, const Sensores& sensores);
+
+
+
 
 
 
