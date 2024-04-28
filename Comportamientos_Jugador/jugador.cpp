@@ -1,23 +1,26 @@
 #include "../Comportamientos_Jugador/jugador.hpp"
 #include "motorlib/util.h"
 
-#include <iostream>
-#include <cmath>
-#include <set>
-#include <stack>
-
 unsigned int ComportamientoJugador::calculoCoste(state &st, const Action &accion)
 {
 	unsigned int coste = 0;
-	if(mapaResultado[st.jugador.f][st.jugador.c] == 'K')
+	if (mapaResultado[st.jugador.f][st.jugador.c] == 'K'){
 		st.objetos_jugador.bikini = true;
-	else if(mapaResultado[st.jugador.f][st.jugador.c] == 'D')
+		st.objetos_jugador.zapatillas = false;
+	}
+	else if (mapaResultado[st.jugador.f][st.jugador.c] == 'D'){
 		st.objetos_jugador.zapatillas = true;
-	if(mapaResultado[st.colaborador.f][st.colaborador.c] == 'K')
+		st.objetos_jugador.bikini = false;
+	}
+	if (mapaResultado[st.colaborador.f][st.colaborador.c] == 'K'){
 		st.objetos_colaborador.bikini = true;
-	else if(mapaResultado[st.colaborador.f][st.colaborador.c] == 'D')
+		st.objetos_colaborador.zapatillas = false;
+	}
+	else if (mapaResultado[st.colaborador.f][st.colaborador.c] == 'D'){
 		st.objetos_colaborador.zapatillas = true;
-		
+		st.objetos_colaborador.bikini = false;
+	}
+
 	switch (accion)
 	{
 	case actWALK:
@@ -88,6 +91,7 @@ unsigned int ComportamientoJugador::calculoCoste(state &st, const Action &accion
 			coste += 1;
 			break;
 		}
+		break;
 	case actTURN_L:
 		switch (mapaResultado[st.jugador.f][st.jugador.c])
 		{
@@ -152,16 +156,19 @@ unsigned int ComportamientoJugador::calculoCoste(state &st, const Action &accion
 		}
 		break;
 	}
-	if(st.ultimaAccionColaborador != actIDLE && st.ultimaAccionColaborador != act_CLB_STOP && accion != act_CLB_STOP && accion != act_CLB_TURN_SR && accion != act_CLB_WALK)
+	if (st.ultimaAccionColaborador != actIDLE && st.ultimaAccionColaborador != act_CLB_STOP && accion != act_CLB_STOP && accion != act_CLB_TURN_SR && accion != act_CLB_WALK)
 		coste += calculoCoste(st, st.ultimaAccionColaborador);
 	return coste;
 }
 
-bool ComportamientoJugador::Find(const state &state, const list<node> &lista) const
+bool ComportamientoJugador::Find(const node &nodo, const set<node> &lista) const
 {
-	for (const node &n : lista)
-		if (n.st == state)
+	for (auto it = lista.cbegin(); it != lista.cend(); ++it)
+	{
+
+		if ((*it).st == nodo.st && (*it).coste <= nodo.coste)
 			return true;
+	}
 	return false;
 }
 
@@ -628,7 +635,8 @@ Action ComportamientoJugador::nivel1(const Sensores &sensores)
 bool ComportamientoJugador::busquedaN2(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores)
 {
 	node currentNode;
-	currentNode.st = current_state.st;
+	currentNode.st = inicio;
+	currentNode.coste = 0;
 	priority_queue<node, vector<node>, functor> frontier;
 	set<node> explored;
 	bool solutionFound = (currentNode.st.jugador.f == final.f && currentNode.st.jugador.c == final.c);
@@ -639,17 +647,21 @@ bool ComportamientoJugador::busquedaN2(const state &inicio, const ubicacion &fin
 	{
 		frontier.pop();
 		explored.insert(currentNode);
-
+		if(currentNode.st.jugador.f == final.f && currentNode.st.jugador.c == final.c)
+			solutionFound = true;
+		else
+		{
 			node child_walk = currentNode;
 			child_walk.coste += calculoCoste(child_walk.st, actWALK);
 			child_walk.st = applyAction(currentNode.st, actWALK);
 			child_walk.secuencia.push_back(actWALK);
 
-			if (child_walk.st.jugador.f == final.f && child_walk.st.jugador.c == final.c)
+			/*if (child_walk.st.jugador.f == final.f && child_walk.st.jugador.c == final.c)
 			{
 				currentNode = child_walk;
 				solutionFound = true;
-			}
+			}*/
+
 			if (!(child_walk == currentNode))
 				frontier.push(child_walk);
 
@@ -657,11 +669,13 @@ bool ComportamientoJugador::busquedaN2(const state &inicio, const ubicacion &fin
 			child_run.coste += calculoCoste(child_run.st, actRUN);
 			child_run.st = applyAction(currentNode.st, actRUN);
 			child_run.secuencia.push_back(actRUN);
-			if (child_run.st.jugador.f == final.f && child_run.st.jugador.c == final.c)
+
+			/*if (child_run.st.jugador.f == final.f && child_run.st.jugador.c == final.c)
 			{
 				currentNode = child_run;
 				solutionFound = true;
-			}
+			}*/
+
 			if (!(child_run == currentNode))
 				frontier.push(child_run);
 
@@ -676,16 +690,17 @@ bool ComportamientoJugador::busquedaN2(const state &inicio, const ubicacion &fin
 			child_turn_l.st = applyAction(currentNode.st, actTURN_L);
 			child_turn_l.secuencia.push_back(actTURN_L);
 
-			frontier.push(child_turn_l);		
+			frontier.push(child_turn_l);
 
-		if (!solutionFound && !frontier.empty())
-		{
-			currentNode = frontier.top();
-			while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
+			if (!solutionFound && !frontier.empty())
 			{
-				frontier.pop();
-				if (!frontier.empty())
-					currentNode = frontier.top();
+				currentNode = frontier.top();
+				while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
+				{
+					frontier.pop();
+					if (!frontier.empty())
+						currentNode = frontier.top();
+				}
 			}
 		}
 	}
@@ -693,6 +708,9 @@ bool ComportamientoJugador::busquedaN2(const state &inicio, const ubicacion &fin
 	{
 		plan = currentNode.secuencia;
 		visualizarPlan(inicio, plan);
+		cout << "Coste del camino: " << currentNode.coste << endl;
+		cout<< "Nodos abiertos: " << frontier.size() << endl;
+		cout<< "Nodos cerrados: " << explored.size() << endl;
 	}
 	return solutionFound;
 }
@@ -859,7 +877,7 @@ Action ComportamientoJugador::nivel2(const Sensores &sensores)
 		accion = plan.front();
 		plan.pop_front();
 	}
-	else if (busquedaN0(current_state.st, {sensores.destinoF, sensores.destinoC}, mapaResultado))
+	else if (busquedaN2(current_state.st, {sensores.destinoF, sensores.destinoC}, mapaResultado, sensores))
 	{
 		if (!plan.empty())
 		{
