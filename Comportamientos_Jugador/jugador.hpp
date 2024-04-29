@@ -16,8 +16,18 @@ struct objetos
   bool zapatillas;
   bool bikini;
 
-  bool operator==(const objetos& other) const{
-    return (zapatillas == other.zapatillas && bikini == other.bikini);
+  bool operator==(const objetos &other) const
+  {
+    return ((zapatillas == other.zapatillas) && (bikini == other.bikini));
+  }
+  bool operator<(const objetos &other) const
+  {
+    if (zapatillas < other.zapatillas)
+      return true;
+    else if (zapatillas == other.zapatillas && bikini < other.bikini)
+      return true;
+    else
+      return false;
   }
 };
 
@@ -31,6 +41,26 @@ struct state
   bool operator==(const state &other) const
   {
     return (jugador == other.jugador && colaborador == other.colaborador && objetos_colaborador == other.objetos_colaborador && objetos_jugador == other.objetos_jugador);
+  }
+  bool operator<(const state &other) const{
+    if (jugador.f < other.jugador.f)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c < other.jugador.c)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula < other.jugador.brujula)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && colaborador.f < other.colaborador.f)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && colaborador.f == other.colaborador.f && colaborador.c < other.colaborador.c)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && colaborador.f == other.colaborador.f && colaborador.c == other.colaborador.c && colaborador.brujula < other.colaborador.brujula)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && colaborador.f == other.colaborador.f && colaborador.c == other.colaborador.c && colaborador.brujula == other.colaborador.brujula && objetos_jugador < other.objetos_jugador)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && colaborador.f == other.colaborador.f && colaborador.c == other.colaborador.c && colaborador.brujula == other.colaborador.brujula && objetos_jugador == other.objetos_jugador && objetos_colaborador < other.objetos_colaborador)
+      return true;
+    else
+      return false;
   }
 };
 
@@ -54,27 +84,14 @@ struct node
 
   bool operator<(const node &other) const
   {
-    if (st.jugador.f < other.st.jugador.f)
-      return true;
-    else if (st.jugador.f == other.st.jugador.f && st.jugador.c < other.st.jugador.c)
-      return true;
-    else if (st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula < other.st.jugador.brujula)
-      return true;
-    else if (st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula == other.st.jugador.brujula && st.colaborador.f < other.st.colaborador.f)
-      return true;
-    else if (st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula == other.st.jugador.brujula && st.colaborador.f == other.st.colaborador.f && st.colaborador.c < other.st.colaborador.c)
-      return true;
-    else if (st.jugador.f == other.st.jugador.f && st.jugador.c == other.st.jugador.c && st.jugador.brujula == other.st.jugador.brujula && st.colaborador.f == other.st.colaborador.f && st.colaborador.c == other.st.colaborador.c && st.colaborador.brujula < other.st.colaborador.brujula)
-      return true;
-    else
-      return false;
+    return (st < other.st);
   }
 };
 struct functor
 {
   bool operator()(const node &a, const node &b) const
   {
-    return (a.coste > b.coste || (a.coste == b.coste && a.st.objetos_jugador.zapatillas && !b.st.objetos_jugador.zapatillas));
+    return (a.coste > b.coste);
   }
 };
 
