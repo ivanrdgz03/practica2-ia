@@ -142,7 +142,7 @@ struct nodeJugador
 
   bool operator<(const nodeJugador &other) const
   {
-    return (coste < other.coste);
+    return (coste > other.coste);
   }
 };
 struct functorJugador
