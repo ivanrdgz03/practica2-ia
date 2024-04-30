@@ -541,7 +541,7 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 		break;
 	case actRUN:
 	 aux = NextCasilla(newState.jugador);
-  aux2 = NextCasilla(ubicacion);
+  aux2 = NextCasilla(aux);
   if (casillaTransitable(aux) && casillaTransitable(aux2) && (aux.f != sensores.CLBposF || aux.c != sensores.CLBposC) && (aux2.f != sensores.CLBposF || aux2.c != sensores.CLBposC))
 			newState.jugador = aux2;
 		break;
