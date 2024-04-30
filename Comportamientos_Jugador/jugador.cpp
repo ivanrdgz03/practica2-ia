@@ -906,7 +906,7 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 				solutionFound = true;
 			}
 			else*/
-			if (!(child_walk == currentNode) && (explored.find(child_walk) == explored.end()))
+			if (!(child_walk == currentNode) && child_walk.coste <= sensores.bateria && (explored.find(child_walk) == explored.end()))
 				frontier.push(child_walk);
 
 			if (!solutionFound)
@@ -916,7 +916,7 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 				child_run.st = applyAction(child_run.st, actRUN, sensores);
 				child_run.secuencia.push_back(actRUN);
 
-				if (!(child_run == currentNode) && (explored.find(child_run) == explored.end()))
+				if (!(child_run == currentNode) && child_run.coste <= sensores.bateria && (explored.find(child_run) == explored.end()))
 					frontier.push(child_run);
 				if (!solutionFound)
 				{
@@ -925,14 +925,14 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 					child_turn_sr.st = applyAction(child_turn_sr.st, actTURN_SR, sensores);
 					child_turn_sr.secuencia.push_back(actTURN_SR);
 
-					if (explored.find(child_turn_sr) == explored.end())
+					if (explored.find(child_turn_sr) == explored.end() && child_turn_sr.coste <= sensores.bateria)
 						frontier.push(child_turn_sr);
 
 					child_turn_l.coste += calculoCoste(child_turn_l.st, actTURN_L);
 					child_turn_l.st = applyAction(child_turn_l.st, actTURN_L, sensores);
 					child_turn_l.secuencia.push_back(actTURN_L);
 
-					if (explored.find(child_turn_l) == explored.end())
+					if (explored.find(child_turn_l) == explored.end() && child_turn_l.coste <= sensores.bateria)
 						frontier.push(child_turn_l);
 				}
 			}
@@ -941,12 +941,12 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 		{
 			currentNode = frontier.top();
 
-			/*while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
+			while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
 			{
 				frontier.pop();
 				if (!frontier.empty())
 					currentNode = frontier.top();
-			}*/
+			}
 		}
 	}
 	if (solutionFound)
