@@ -531,17 +531,17 @@ state ComportamientoJugador::applyAction(const state &st, const Action &accion) 
 stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Action &accion, const Sensores &sensores) const
 {
 	stateJugador newState = st;
-
+ ubicacion aux,aux2;
 	switch (accion)
 	{
 	case actWALK:
-		ubicacion aux = NextCasilla(newState.jugador);
+		aux = NextCasilla(newState.jugador);
 		if (casillaTransitable(aux) && (aux.f != sensores.CLBposF || aux.c != sensores.CLBposC))
 			newState.jugador = aux;
 		break;
 	case actRUN:
-	 ubicacion aux = NextCasilla(newState.jugador);
-  ubicacion aux2 = NextCasilla(ubicacion);
+	 aux = NextCasilla(newState.jugador);
+  aux2 = NextCasilla(ubicacion);
   if (casillaTransitable(aux) && casillaTransitable(aux2) && (aux.f != sensores.CLBposF || aux.c != sensores.CLBposC) && (aux2.f != sensores.CLBposF || aux2.c != sensores.CLBposC))
 			newState.jugador = aux2;
 		break;
