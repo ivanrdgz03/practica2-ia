@@ -526,9 +526,9 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 			newState.jugador.f--;
 			break;
 		}
-		if(!casillaTransitable(newState.jugador)){
+		if(!casillaTransitable(newState.jugador))
 			return st;
-		}
+		
 	case actWALK:
 		switch (newState.jugador.brujula)
 		{
