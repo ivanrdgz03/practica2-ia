@@ -277,10 +277,10 @@ void MonitorJuego::inicializar(int pos_filaJ, int pos_colJ, int brujJ, int pos_f
   int tama = getMapa()->getNCols();
 
   int ncolaboradores = 1;
-  //int naldeanos = 0;
-  //int nlobos = 0;
-  int naldeanos = tama / 10;
-  int nlobos = tama / 10;
+  int naldeanos = 0;
+  int nlobos = 0;
+  //int naldeanos = tama / 10;
+  //int nlobos = tama / 10;
   unsigned char celdaRand;
 
   // Se construye una lisa con 300 objetivos
@@ -676,4 +676,13 @@ void MonitorJuego::init_casillas_especiales(unsigned int f, unsigned int c, unsi
     get_entidad(1)->Cogio_Bikini(true);
   }
 
+}
+
+void MonitorJuego::reset_objetivos(){
+  if(!objetivos.empty()){
+     objetivos.clear();
+  }
+  if(!objetivosActivos.empty()){
+    objetivosActivos.clear();
+  }
 }

@@ -332,6 +332,8 @@ void botonAceptarNuevoMapaCB(int valor)
     const char *file = listbox->curr_text.c_str();
     monitor.setMapa(strcat(path, file));
 
+    monitor.reset_objetivos();
+
     // posicion del agente y del colaborador
     if (monitor.numero_entidades() > 1)
     {
