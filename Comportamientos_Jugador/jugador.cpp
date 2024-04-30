@@ -325,7 +325,7 @@ void ComportamientoJugador::reseteoMatriz(vector<vector<unsigned char>> &matriz)
 
 bool ComportamientoJugador::casillaTransitable(const ubicacion &u) const
 {
-	return mapaResultado[u.f][u.c] != 'M' && mapaResultado[u.f][u.c] != 'P';
+	return ((mapaResultado[u.f][u.c] != 'M') && (mapaResultado[u.f][u.c] != 'P'));
 }
 
 state ComportamientoJugador::applyAction(const state &st, const Action &accion) const
@@ -488,59 +488,61 @@ state ComportamientoJugador::applyAction(const state &st, const Action &accion) 
 	return newState;
 }
 
-ubicacion ComportamientoJugador::nextCasilla(const ubicacion& u) const{
+ubicacion ComportamientoJugador::nextCasilla(const ubicacion &u) const
+{
 	ubicacion salida = u;
 	switch (salida.brujula)
-		{
-		case 0:
-			salida.f--;
-			break;
-		case 1:
-			salida.c++;
-			salida.f--;
-			break;
-		case 2:
-			salida.c++;
-			break;
-		case 3:
-			salida.c++;
-			salida.f++;
-			break;
-		case 4:
-			salida.f++;
-			break;
-		case 5:
-			salida.c--;
-			salida.f++;
-			break;
-		case 6:
-			salida.c--;
-			break;
-		case 7:
-			salida.c--;
-			salida.f--;
-			break;
-		}
+	{
+	case 0:
+		salida.f--;
+		break;
+	case 1:
+		salida.c++;
+		salida.f--;
+		break;
+	case 2:
+		salida.c++;
+		break;
+	case 3:
+		salida.c++;
+		salida.f++;
+		break;
+	case 4:
+		salida.f++;
+		break;
+	case 5:
+		salida.c--;
+		salida.f++;
+		break;
+	case 6:
+		salida.c--;
+		break;
+	case 7:
+		salida.c--;
+		salida.f--;
+		break;
+	}
 	return salida;
 }
 
 stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Action &accion, const Sensores &sensores) const
 {
 	stateJugador newState = st;
-
+	if (st.jugador.f == 73 && st.jugador.c == 51 && st.jugador.brujula == noreste && accion == actRUN)
+		cout << "hola" << endl;
 	switch (accion)
 	{
 	case actRUN:
 		newState.jugador = nextCasilla(newState.jugador);
-		if(!casillaTransitable(newState.jugador))
+		if (!casillaTransitable(newState.jugador))
 			return st;
 		newState.jugador = nextCasilla(newState.jugador);
-		if(!casillaTransitable(newState.jugador))
+		if (!casillaTransitable(newState.jugador))
 			return st;
 		break;
 	case actWALK:
 		newState.jugador = nextCasilla(newState.jugador);
-		if(!casillaTransitable(newState.jugador))
+		if (!casillaTransitable(newState.jugador))
 			return st;
 		break;
 	case actTURN_SR:
@@ -868,10 +870,12 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 				nodeJugador child_run = currentNode;
 				child_run.coste += calculoCoste(child_run.st, actRUN);
 				child_run.st = applyAction(child_run.st, actRUN, sensores);
-				child_run.secuencia.push_back(actRUN);
 
 				if (!(child_run == currentNode) && child_run.coste <= sensores.bateria && (explored.find(child_run) == explored.end()))
+				{
+					child_run.secuencia.push_back(actRUN);
 					frontier.push(child_run);
+				}
 				if (!solutionFound)
 				{
 					nodeJugador child_turn_sr = currentNode, child_turn_l = currentNode;
