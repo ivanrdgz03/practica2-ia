@@ -955,6 +955,7 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 				frontier.pop();
 				if (!frontier.empty())
 					currentNode = frontier.top();
+	
 			}
 		}
 	}
