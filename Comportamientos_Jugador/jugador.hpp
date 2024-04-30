@@ -247,6 +247,7 @@ private:
 
   bool busquedaN3(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
   Action nivel3(const Sensores &sensores);
+ubicacion NextCasilla(const ubicacion &pos) const;
 };
 
 #endif
