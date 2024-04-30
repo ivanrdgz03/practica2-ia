@@ -148,26 +148,20 @@ unsigned int ComportamientoJugador::calculoCoste(const state &st, const Action &
 unsigned int ComportamientoJugador::calculoCoste(const stateJugador &st, const Action &accion) const
 {
 	unsigned int coste = 0;
-
+	const unsigned char terreno = mapaResultado[st.jugador.f][st.jugador.c];
 	switch (accion)
 	{
 	case actWALK:
-		switch (mapaResultado[st.jugador.f][st.jugador.c])
+		switch (terreno)
 		{
 		case 'T':
 			coste += 2;
 			break;
 		case 'B':
-			if (st.objetos_jugador.zapatillas)
-				coste += 15;
-			else
-				coste += 50;
+			coste += st.objetos_jugador.zapatillas ? 15 : 50;
 			break;
 		case 'A':
-			if (st.objetos_jugador.bikini)
-				coste += 10;
-			else
-				coste += 100;
+			coste += st.objetos_jugador.bikini ? 10 : 100;
 			break;
 		default:
 			coste += 1;
@@ -175,22 +169,16 @@ unsigned int ComportamientoJugador::calculoCoste(const stateJugador &st, const A
 		}
 		break;
 	case actRUN:
-		switch (mapaResultado[st.jugador.f][st.jugador.c])
+		switch (terreno)
 		{
 		case 'T':
 			coste += 3;
 			break;
 		case 'B':
-			if (st.objetos_jugador.zapatillas)
-				coste += 25;
-			else
-				coste += 75;
+			coste += st.objetos_jugador.zapatillas ? 25 : 75;
 			break;
 		case 'A':
-			if (st.objetos_jugador.bikini)
-				coste += 15;
-			else
-				coste += 150;
+			coste += st.objetos_jugador.bikini ? 15 : 150;
 			break;
 		default:
 			coste += 1;
@@ -198,22 +186,16 @@ unsigned int ComportamientoJugador::calculoCoste(const stateJugador &st, const A
 		}
 		break;
 	case actTURN_L:
-		switch (mapaResultado[st.jugador.f][st.jugador.c])
+		switch (terreno)
 		{
 		case 'T':
 			coste += 2;
 			break;
 		case 'B':
-			if (st.objetos_jugador.zapatillas)
-				coste += 1;
-			else
-				coste += 7;
+			coste += st.objetos_jugador.zapatillas ? 1 : 7;
 			break;
 		case 'A':
-			if (st.objetos_jugador.bikini)
-				coste += 5;
-			else
-				coste += 30;
+			coste += st.objetos_jugador.bikini ? 5 : 30;
 			break;
 		default:
 			coste += 1;
@@ -221,19 +203,13 @@ unsigned int ComportamientoJugador::calculoCoste(const stateJugador &st, const A
 		}
 		break;
 	case actTURN_SR:
-		switch (mapaResultado[st.jugador.f][st.jugador.c])
+		switch (terreno)
 		{
 		case 'B':
-			if (st.objetos_jugador.zapatillas)
-				coste += 1;
-			else
-				coste += 5;
+			coste += st.objetos_jugador.zapatillas ? 1 : 5;
 			break;
 		case 'A':
-			if (st.objetos_jugador.bikini)
-				coste += 2;
-			else
-				coste += 10;
+			coste += st.objetos_jugador.bikini ? 2 : 10;
 			break;
 		default:
 			coste += 1;
@@ -518,6 +494,42 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 
 	switch (accion)
 	{
+	case actRUN:
+		switch (newState.jugador.brujula)
+		{
+		case 0:
+			newState.jugador.f--;
+			break;
+		case 1:
+			newState.jugador.c++;
+			newState.jugador.f--;
+			break;
+		case 2:
+			newState.jugador.c++;
+			break;
+		case 3:
+			newState.jugador.c++;
+			newState.jugador.f++;
+			break;
+		case 4:
+			newState.jugador.f++;
+			break;
+		case 5:
+			newState.jugador.c--;
+			newState.jugador.f++;
+			break;
+		case 6:
+			newState.jugador.c--;
+			break;
+		case 7:
+			newState.jugador.c--;
+			newState.jugador.f--;
+			break;
+		}
+		if(!casillaTransitable(newState.jugador)){
+			newState = st;
+			break;
+		}
 	case actWALK:
 		switch (newState.jugador.brujula)
 		{
@@ -550,39 +562,9 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 			newState.jugador.f--;
 			break;
 		}
-		break;
-	case actRUN:
-		switch (newState.jugador.brujula)
-		{
-		case 0:
-			newState.jugador.f -= 2;
-			break;
-		case 1:
-			newState.jugador.c += 2;
-			newState.jugador.f -= 2;
-			break;
-		case 2:
-			newState.jugador.c += 2;
-			break;
-		case 3:
-			newState.jugador.c += 2;
-			newState.jugador.f += 2;
-			break;
-		case 4:
-			newState.jugador.f += 2;
-			break;
-		case 5:
-			newState.jugador.c -= 2;
-			newState.jugador.f += 2;
-			break;
-		case 6:
-			newState.jugador.c -= 2;
-			break;
-		case 7:
-			newState.jugador.c -= 2;
-			newState.jugador.f -= 2;
-			break;
-		}
+		if(!casillaTransitable(newState.jugador))
+			newState = st;
+		
 		break;
 	case actTURN_SR:
 		newState.jugador.brujula = (Orientacion)((newState.jugador.brujula + 1) % 8);
@@ -595,11 +577,6 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 	default:
 		throw("Acción no reconocida");
 	}
-
-	if (accion == actRUN && ((applyAction(st, actWALK, sensores) == st) || !casillaTransitable(newState.jugador)))
-		newState = st;
-	else if (accion == actWALK && !casillaTransitable(newState.jugador))
-		newState = st;
 	if (newState.jugador.f == sensores.CLBposF && newState.jugador.c == sensores.CLBposC)
 		newState = st;
 
