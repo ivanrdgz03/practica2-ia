@@ -526,7 +526,7 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 			newState.jugador.f--;
 			break;
 		}
-		if(!casillaTransitable(newState.jugador))
+		if (!casillaTransitable(newState.jugador))
 			return st;
 		break;
 	case actRUN:
@@ -588,7 +588,6 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 		newState.objetos_jugador.zapatillas = true;
 		newState.objetos_jugador.bikini = false;
 	}
-
 
 	return newState;
 }
@@ -874,7 +873,6 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 			nodeJugador child_walk = currentNode;
 			child_walk.coste += calculoCoste(child_walk.st, actWALK);
 			child_walk.st = applyAction(child_walk.st, actWALK, sensores);
-			child_walk.secuencia.push_back(actWALK);
 
 			/*if (child_walk.st.jugador.f == final.f && child_walk.st.jugador.c == final.c)
 			{
@@ -883,33 +881,42 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 			}
 			else*/
 			if (!(child_walk == currentNode) && child_walk.coste <= sensores.bateria && (explored.find(child_walk) == explored.end()))
+			{
+				child_walk.secuencia.push_back(actWALK);
 				frontier.push(child_walk);
+			}
 
 			if (!solutionFound)
 			{
 				nodeJugador child_run = currentNode;
 				child_run.coste += calculoCoste(child_run.st, actRUN);
 				child_run.st = applyAction(child_run.st, actRUN, sensores);
-				child_run.secuencia.push_back(actRUN);
 
 				if (!(child_run == currentNode) && child_run.coste <= sensores.bateria && (explored.find(child_run) == explored.end()))
+				{
+					child_run.secuencia.push_back(actRUN);
 					frontier.push(child_run);
+				}
 				if (!solutionFound)
 				{
 					nodeJugador child_turn_sr = currentNode, child_turn_l = currentNode;
 					child_turn_sr.coste += calculoCoste(child_turn_sr.st, actTURN_SR);
 					child_turn_sr.st = applyAction(child_turn_sr.st, actTURN_SR, sensores);
-					child_turn_sr.secuencia.push_back(actTURN_SR);
 
 					if (explored.find(child_turn_sr) == explored.end() && child_turn_sr.coste <= sensores.bateria)
+					{
+						child_turn_sr.secuencia.push_back(actTURN_SR);
 						frontier.push(child_turn_sr);
+					}
 
 					child_turn_l.coste += calculoCoste(child_turn_l.st, actTURN_L);
 					child_turn_l.st = applyAction(child_turn_l.st, actTURN_L, sensores);
-					child_turn_l.secuencia.push_back(actTURN_L);
 
 					if (explored.find(child_turn_l) == explored.end() && child_turn_l.coste <= sensores.bateria)
+					{
+						child_turn_l.secuencia.push_back(actTURN_L);
 						frontier.push(child_turn_l);
+					}
 				}
 			}
 		}
