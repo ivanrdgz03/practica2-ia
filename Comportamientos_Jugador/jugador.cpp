@@ -535,72 +535,15 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 	switch (accion)
 	{
 	case actWALK:
-		switch (newState.jugador.brujula)
-		{
-		case 0:
-			newState.jugador.f--;
-			break;
-		case 1:
-			newState.jugador.c++;
-			newState.jugador.f--;
-			break;
-		case 2:
-			newState.jugador.c++;
-			break;
-		case 3:
-			newState.jugador.c++;
-			newState.jugador.f++;
-			break;
-		case 4:
-			newState.jugador.f++;
-			break;
-		case 5:
-			newState.jugador.c--;
-			newState.jugador.f++;
-			break;
-		case 6:
-			newState.jugador.c--;
-			break;
-		case 7:
-			newState.jugador.c--;
-			newState.jugador.f--;
-			break;
-		}
-		if (!casillaTransitable(newState.jugador))
-			return st;
+		ubicacion aux = NextCasilla(newState.jugador);
+		if (casillaTransitable(aux) && (aux.f != sensores.CLBposF || aux.c != sensores.CLBposC))
+			newState.jugador = aux;
 		break;
 	case actRUN:
-		switch (newState.jugador.brujula)
-		{
-		case 0:
-			newState.jugador.f -= 2;
-			break;
-		case 1:
-			newState.jugador.c += 2;
-			newState.jugador.f -= 2;
-			break;
-		case 2:
-			newState.jugador.c += 2;
-			break;
-		case 3:
-			newState.jugador.c += 2;
-			newState.jugador.f += 2;
-			break;
-		case 4:
-			newState.jugador.f += 2;
-			break;
-		case 5:
-			newState.jugador.c -= 2;
-			newState.jugador.f += 2;
-			break;
-		case 6:
-			newState.jugador.c -= 2;
-			break;
-		case 7:
-			newState.jugador.c -= 2;
-			newState.jugador.f -= 2;
-			break;
-		}
+	 ubicacion aux = NextCasilla(newState.jugador);
+  ubicacion aux2 = NextCasilla(ubicacion);
+  if (casillaTransitable(aux) && casillaTransitable(aux2) && (aux.f != sensores.CLBposF || aux.c != sensores.CLBposC) && (aux2.f != sensores.CLBposF || aux2.c != sensores.CLBposC))
+			newState.jugador = aux2;
 		break;
 	case actTURN_SR:
 		newState.jugador.brujula = (Orientacion)((newState.jugador.brujula + 1) % 8);
@@ -614,10 +557,6 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 		throw("Acción no reconocida");
 	}
 
-	if (accion == actRUN && ((applyAction(st, actWALK, sensores) == st) || !casillaTransitable(newState.jugador)))
-		newState = st;
-	if (newState.jugador.f == sensores.CLBposF && newState.jugador.c == sensores.CLBposC)
-		newState = st;
 	if (mapaResultado[newState.jugador.f][newState.jugador.c] == 'K')
 	{
 		newState.objetos_jugador.bikini = true;
