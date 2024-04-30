@@ -1,7 +1,7 @@
 #include "../Comportamientos_Jugador/jugador.hpp"
 #include "motorlib/util.h"
 
-ubicacion NextCasilla(const ubicacion &pos)
+ubicacion ComportamientoJugador::NextCasilla(const ubicacion &pos) const
 {
         ubicacion salida = pos;
         switch (pos.brujula)
