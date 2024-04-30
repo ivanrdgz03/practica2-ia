@@ -527,8 +527,7 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 			break;
 		}
 		if(!casillaTransitable(newState.jugador)){
-			newState = st;
-			break;
+			return st;
 		}
 	case actWALK:
 		switch (newState.jugador.brujula)
@@ -563,7 +562,7 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 			break;
 		}
 		if(!casillaTransitable(newState.jugador))
-			newState = st;
+			return st;
 		
 		break;
 	case actTURN_SR:
@@ -578,7 +577,7 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 		throw("Acción no reconocida");
 	}
 	if (newState.jugador.f == sensores.CLBposF && newState.jugador.c == sensores.CLBposC)
-		newState = st;
+		return st;
 
 	if (mapaResultado[newState.jugador.f][newState.jugador.c] == 'K')
 	{
