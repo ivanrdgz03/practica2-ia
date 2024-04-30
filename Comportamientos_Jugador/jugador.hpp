@@ -89,9 +89,13 @@ struct node
 };
 struct functor
 {
+  private:
+    Sensores sensores;
+  public:
+  functor(const Sensores& sensores): sensores(sensores){}
   bool operator()(const node &a, const node &b) const
   {
-    return (a.coste > b.coste);
+    return ((a.coste+abs(a.st.colaborador.f - sensores.destinoF + a.st.colaborador.c - sensores.destinoC)) > (b.coste + abs(b.st.colaborador.f - sensores.destinoF + b.st.colaborador.c - sensores.destinoC)));
   }
 };
 
@@ -241,6 +245,7 @@ private:
 
 
   bool busquedaN3(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
+  Action nivel3(const Sensores &sensores);
 };
 
 #endif
