@@ -653,64 +653,59 @@ bool ComportamientoJugador::busquedaN2(const state &inicio, const ubicacion &fin
 		frontier.pop();
 		explored.insert(currentNode);
 
-		if (currentNode.st.jugador.f == final.f && currentNode.st.jugador.c == final.c)
-			solutionFound = true;
-		else
-		{
-			node child_walk = currentNode;
-			child_walk.st = applyAction(currentNode.st, actWALK);
-			child_walk.coste += calculoCoste(child_walk.st, actWALK);
-			child_walk.secuencia.push_back(actWALK);
+		node child_walk = currentNode;
+		child_walk.st = applyAction(currentNode.st, actWALK);
+		child_walk.coste += calculoCoste(child_walk.st, actWALK);
+		child_walk.secuencia.push_back(actWALK);
 
-			if (child_walk.st.jugador.f == final.f && child_walk.st.jugador.c == final.c)
+		if (child_walk.st.jugador.f == final.f && child_walk.st.jugador.c == final.c)
+		{
+			currentNode = child_walk;
+			solutionFound = true;
+		}
+		else if (!(child_walk == currentNode))
+			frontier.push(child_walk);
+
+		if (!solutionFound)
+		{
+			node child_run = currentNode;
+			child_run.st = applyAction(currentNode.st, actRUN);
+			child_run.coste += calculoCoste(child_run.st, actRUN);
+			child_run.secuencia.push_back(actRUN);
+
+			if (child_run.st.jugador.f == final.f && child_run.st.jugador.c == final.c)
 			{
-				currentNode = child_walk;
+				currentNode = child_run;
 				solutionFound = true;
 			}
-			else if (!(child_walk == currentNode))
-				frontier.push(child_walk);
 
+			else if (!(child_run == currentNode))
+				frontier.push(child_run);
 			if (!solutionFound)
 			{
-				node child_run = currentNode;
-				child_run.st = applyAction(currentNode.st, actRUN);
-				child_run.coste += calculoCoste(child_run.st, actRUN);
-				child_run.secuencia.push_back(actRUN);
+				node child_turn_sr = currentNode, child_turn_l = currentNode;
+				child_turn_sr.st = applyAction(currentNode.st, actTURN_SR);
+				child_turn_sr.coste += calculoCoste(child_turn_sr.st, actTURN_SR);
+				child_turn_sr.secuencia.push_back(actTURN_SR);
 
-				if (child_run.st.jugador.f == final.f && child_run.st.jugador.c == final.c)
-				{
-					currentNode = child_run;
-					solutionFound = true;
-				}
+				frontier.push(child_turn_sr);
 
-				else if (!(child_run == currentNode))
-					frontier.push(child_run);
-				if (!solutionFound)
-				{
-					node child_turn_sr = currentNode, child_turn_l = currentNode;
-					child_turn_sr.st = applyAction(currentNode.st, actTURN_SR);
-					child_turn_sr.coste += calculoCoste(child_turn_sr.st, actTURN_SR);
-					child_turn_sr.secuencia.push_back(actTURN_SR);
+				child_turn_l.st = applyAction(currentNode.st, actTURN_L);
+				child_turn_l.coste += calculoCoste(child_turn_l.st, actTURN_L);
+				child_turn_l.secuencia.push_back(actTURN_L);
 
-					frontier.push(child_turn_sr);
-
-					child_turn_l.st = applyAction(currentNode.st, actTURN_L);
-					child_turn_l.coste += calculoCoste(child_turn_l.st, actTURN_L);
-					child_turn_l.secuencia.push_back(actTURN_L);
-
-					frontier.push(child_turn_l);
-				}
+				frontier.push(child_turn_l);
 			}
-			if (!solutionFound && !frontier.empty())
+		}
+		if (!solutionFound && !frontier.empty())
+		{
+			currentNode = frontier.top();
+
+			while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
 			{
-				currentNode = frontier.top();
-		
-				while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
-				{
-					frontier.pop();
-					if (!frontier.empty())
-						currentNode = frontier.top();
-				}
+				frontier.pop();
+				if (!frontier.empty())
+					currentNode = frontier.top();
 			}
 		}
 	}
