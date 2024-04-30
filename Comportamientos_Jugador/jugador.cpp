@@ -526,6 +526,8 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 			newState.jugador.f--;
 			break;
 		}
+		if(!casillaTransitable(newState.jugador))
+			return st;
 		break;
 	case actRUN:
 		switch (newState.jugador.brujula)
@@ -574,11 +576,8 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 
 	if (accion == actRUN && ((applyAction(st, actWALK, sensores) == st) || !casillaTransitable(newState.jugador)))
 		newState = st;
-	else if (accion == actWALK && !casillaTransitable(newState.jugador))
-		newState = st;
 	if (newState.jugador.f == sensores.CLBposF && newState.jugador.c == sensores.CLBposC)
 		newState = st;
-
 	if (mapaResultado[newState.jugador.f][newState.jugador.c] == 'K')
 	{
 		newState.objetos_jugador.bikini = true;
@@ -589,6 +588,7 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 		newState.objetos_jugador.zapatillas = true;
 		newState.objetos_jugador.bikini = false;
 	}
+
 
 	return newState;
 }
