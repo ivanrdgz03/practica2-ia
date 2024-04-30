@@ -923,8 +923,8 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 		if (!solutionFound && !frontier.empty())
 		{
 			currentNode = frontier.top();
-
-			while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
+			set<nodeJugador>::iterator it;
+			while (!frontier.empty() && ((it = explored.find(currentNode)) != explored.end()))
 			{
 				frontier.pop();
 				if (!frontier.empty())
@@ -953,11 +953,7 @@ bool ComportamientoJugador::busquedaN3(const state &inicio, const ubicacion &fin
 	bool solutionFound = (currentNode.st.colaborador.f == final.f && currentNode.st.colaborador.c == final.c);
 
 	frontier.push(currentNode);
-	list<Action> aux;
-	aux.push_back(actRUN);
-	aux.push_back(actTURN_L);
-	aux.push_back(actWALK);
-	aux.push_back(actTURN_L);
+
 	while (!frontier.empty() && !solutionFound)
 	{
 		frontier.pop();
@@ -973,86 +969,101 @@ bool ComportamientoJugador::busquedaN3(const state &inicio, const ubicacion &fin
 				node child_colab_walk = currentNode;
 				child_colab_walk.coste += calculoCoste(child_colab_walk.st, act_CLB_WALK);
 				child_colab_walk.st = applyAction(currentNode.st, act_CLB_WALK);
-				child_colab_walk.secuencia.push_back(act_CLB_WALK);
 
-				if (!(child_colab_walk == currentNode))
+				if (!(child_colab_walk == currentNode) && child_colab_walk.coste <= sensores.bateria && (explored.find(child_colab_walk) == explored.end()))
+				{
+					child_colab_walk.secuencia.push_back(act_CLB_WALK);
 					frontier.push(child_colab_walk);
+				}
 
 				if (!solutionFound)
 				{
 					node child_colab_turn = currentNode;
 					child_colab_turn.coste += calculoCoste(child_colab_turn.st, act_CLB_TURN_SR);
 					child_colab_turn.st = applyAction(currentNode.st, act_CLB_TURN_SR);
-					child_colab_turn.secuencia.push_back(act_CLB_TURN_SR);
-					if (!(child_colab_turn == currentNode))
+					if (!(child_colab_turn == currentNode) && child_colab_turn.coste <= sensores.bateria && (explored.find(child_colab_turn) == explored.end()))
+					{
+						child_colab_turn.secuencia.push_back(act_CLB_TURN_SR);
 						frontier.push(child_colab_turn);
-
-					node child_colab_stop = currentNode;
-					child_colab_stop.st = applyAction(currentNode.st, act_CLB_STOP);
-					child_colab_stop.secuencia.push_back(act_CLB_STOP);
-
-					frontier.push(child_colab_stop);
+					}
+					if (currentNode.st.ultimaAccionColaborador != act_CLB_STOP)
+					{
+						node child_colab_stop = currentNode;
+						child_colab_stop.st = applyAction(currentNode.st, act_CLB_STOP);
+						if ((explored.find(child_colab_stop) == explored.end()) && child_colab_stop.coste <= sensores.bateria)
+						{
+							child_colab_stop.secuencia.push_back(act_CLB_STOP);
+							frontier.push(child_colab_stop);
+						}
+					}
 				}
-			}
-			if (!solutionFound)
-			{
-				node child_walk = currentNode;
-				child_walk.coste += calculoCoste(child_walk.st, actWALK);
-				child_walk.st = applyAction(child_walk.st, actWALK);
-				child_walk.secuencia.push_back(actWALK);
-
-				/*if (child_walk.st.jugador.f == final.f && child_walk.st.jugador.c == final.c)
-				{
-					currentNode = child_walk;
-					solutionFound = true;
-				}
-				else*/
-				if (!(child_walk == currentNode))
-					frontier.push(child_walk);
-
 				if (!solutionFound)
 				{
-					node child_run = currentNode;
-					child_run.coste += calculoCoste(child_run.st, actRUN);
-					child_run.st = applyAction(child_run.st, actRUN);
-					child_run.secuencia.push_back(actRUN);
+					node child_walk = currentNode;
+					child_walk.coste += calculoCoste(child_walk.st, actWALK);
+					child_walk.st = applyAction(child_walk.st, actWALK);
 
-					/*if (child_run.st.jugador.f == final.f && child_run.st.jugador.c == final.c)
+					/*if (child_walk.st.jugador.f == final.f && child_walk.st.jugador.c == final.c)
 					{
-						currentNode = child_run;
+						currentNode = child_walk;
 						solutionFound = true;
 					}
+					else*/
+					if (!(child_walk == currentNode) && child_walk.coste <= sensores.bateria && (explored.find(child_walk) == explored.end()))
+					{
+						child_walk.secuencia.push_back(actWALK);
+						frontier.push(child_walk);
+					}
 
-					else */
-					if (!(child_run == currentNode))
-						frontier.push(child_run);
 					if (!solutionFound)
 					{
-						node child_turn_sr = currentNode, child_turn_l = currentNode;
-						child_turn_sr.coste += calculoCoste(child_turn_sr.st, actTURN_SR);
-						child_turn_sr.st = applyAction(child_turn_sr.st, actTURN_SR);
-						child_turn_sr.secuencia.push_back(actTURN_SR);
+						node child_run = currentNode;
+						child_run.coste += calculoCoste(child_run.st, actRUN);
+						child_run.st = applyAction(child_run.st, actRUN);
 
-						frontier.push(child_turn_sr);
+						/*if (child_run.st.jugador.f == final.f && child_run.st.jugador.c == final.c)
+						{
+							currentNode = child_run;
+							solutionFound = true;
+						}
 
-						child_turn_l.coste += calculoCoste(child_turn_l.st, actTURN_L);
-						child_turn_l.st = applyAction(child_turn_l.st, actTURN_L);
-						child_turn_l.secuencia.push_back(actTURN_L);
-
-						frontier.push(child_turn_l);
+						else */
+						if (!(child_run == currentNode) && child_run.coste <= sensores.bateria && (explored.find(child_run) == explored.end()))
+						{
+							child_run.secuencia.push_back(actRUN);
+							frontier.push(child_run);
+						}
+						if (!solutionFound)
+						{
+							node child_turn_sr = currentNode, child_turn_l = currentNode;
+							child_turn_sr.coste += calculoCoste(child_turn_sr.st, actTURN_SR);
+							child_turn_sr.st = applyAction(child_turn_sr.st, actTURN_SR);
+							if (child_turn_sr.coste <= sensores.bateria && (explored.find(child_turn_sr) == explored.end()))
+							{
+								child_turn_sr.secuencia.push_back(actTURN_SR);
+								frontier.push(child_turn_sr);
+							}
+							child_turn_l.coste += calculoCoste(child_turn_l.st, actTURN_L);
+							child_turn_l.st = applyAction(child_turn_l.st, actTURN_L);
+							if (child_turn_l.coste <= sensores.bateria && (explored.find(child_turn_l) == explored.end()))
+							{
+								child_turn_l.secuencia.push_back(actTURN_L);
+								frontier.push(child_turn_l);
+							}
+						}
 					}
 				}
 			}
-		}
-		if (!solutionFound && !frontier.empty())
-		{
-			currentNode = frontier.top();
+			if (!solutionFound && !frontier.empty())
+			{	
+				currentNode = frontier.top();
 
-			while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
-			{
-				frontier.pop();
-				if (!frontier.empty())
-					currentNode = frontier.top();
+				while (!frontier.empty() && (explored.find(currentNode) != explored.end()))
+				{
+					frontier.pop();
+					if (!frontier.empty())
+						currentNode = frontier.top();
+				}
 			}
 		}
 	}
@@ -1084,7 +1095,6 @@ Action ComportamientoJugador::nivel0(const Sensores &sensores)
 	{
 		if (!plan.empty())
 		{
-			cout << "Se realiza la planificacion con " << plan.size() << " movimientos" << endl;
 			accion = plan.front();
 			plan.pop_front();
 			hayPlan = true;
@@ -1125,7 +1135,6 @@ Action ComportamientoJugador::nivel2(const Sensores &sensores)
 	{
 		if (!plan.empty())
 		{
-			// cout << "Se realiza la planificacion con " << plan.size() << " movimientos" << endl;
 			accion = plan.front();
 			plan.pop_front();
 			hayPlan = true;
@@ -1179,7 +1188,6 @@ Action ComportamientoJugador::nivel3(const Sensores &sensores)
 	{
 		if (!plan.empty())
 		{
-			// cout << "Se realiza la planificacion con " << plan.size() << " movimientos" << endl;
 			accion = plan.front();
 			plan.pop_front();
 			hayPlan = true;
