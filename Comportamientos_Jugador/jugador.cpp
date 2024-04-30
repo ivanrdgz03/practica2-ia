@@ -1,6 +1,46 @@
 #include "../Comportamientos_Jugador/jugador.hpp"
 #include "motorlib/util.h"
 
+ubicacion NextCasilla(const ubicacion &pos)
+{
+        ubicacion salida = pos;
+        switch (pos.brujula)
+        {
+        case norte:
+                salida.f = pos.f - 1;
+                break;
+        case noreste:
+                salida.f = pos.f - 1;
+                salida.c = pos.c + 1;
+                break;
+        case este:
+                salida.c = pos.c + 1;
+                break;
+        case sureste:
+                salida.f = pos.f + 1;
+                salida.c = pos.c + 1;
+                break;
+        case sur:
+                salida.f = pos.f + 1;
+                break;
+        case suroeste:
+                salida.f = pos.f + 1;
+                salida.c = pos.c - 1;
+                break;
+        case oeste:
+                salida.c = pos.c - 1;
+                break;
+        case noroeste:
+                salida.f = pos.f - 1;
+                salida.c = pos.c - 1;
+                break;
+        default:
+                break;
+        }
+
+        return salida;
+}
+
 unsigned int ComportamientoJugador::calculoCoste(const state &st, const Action &accion) const
 {
 	unsigned int coste = 0;
