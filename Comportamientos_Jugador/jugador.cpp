@@ -325,7 +325,7 @@ void ComportamientoJugador::reseteoMatriz(vector<vector<unsigned char>> &matriz)
 
 bool ComportamientoJugador::casillaTransitable(const ubicacion &u) const
 {
-	return ((mapaResultado[u.f][u.c] != 'M') && (mapaResultado[u.f][u.c] != 'P'));
+	return mapaResultado[u.f][u.c] != 'M' && mapaResultado[u.f][u.c] != 'P';
 }
 
 state ComportamientoJugador::applyAction(const state &st, const Action &accion) const
@@ -488,62 +488,77 @@ state ComportamientoJugador::applyAction(const state &st, const Action &accion) 
 	return newState;
 }
 
-ubicacion ComportamientoJugador::nextCasilla(const ubicacion &u) const
-{
-	ubicacion salida = u;
-	switch (salida.brujula)
-	{
-	case 0:
-		salida.f--;
-		break;
-	case 1:
-		salida.c++;
-		salida.f--;
-		break;
-	case 2:
-		salida.c++;
-		break;
-	case 3:
-		salida.c++;
-		salida.f++;
-		break;
-	case 4:
-		salida.f++;
-		break;
-	case 5:
-		salida.c--;
-		salida.f++;
-		break;
-	case 6:
-		salida.c--;
-		break;
-	case 7:
-		salida.c--;
-		salida.f--;
-		break;
-	}
-	return salida;
-}
-
 stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Action &accion, const Sensores &sensores) const
 {
 	stateJugador newState = st;
-	if (st.jugador.f == 73 && st.jugador.c == 51 && st.jugador.brujula == noreste && accion == actRUN)
-		cout << "hola" << endl;
+
 	switch (accion)
 	{
-	case actRUN:
-		newState.jugador = nextCasilla(newState.jugador);
-		if (!casillaTransitable(newState.jugador))
-			return st;
-		newState.jugador = nextCasilla(newState.jugador);
-		if (!casillaTransitable(newState.jugador))
-			return st;
-		break;
 	case actWALK:
-		newState.jugador = nextCasilla(newState.jugador);
-		if (!casillaTransitable(newState.jugador))
-			return st;
+		switch (newState.jugador.brujula)
+		{
+		case 0:
+			newState.jugador.f--;
+			break;
+		case 1:
+			newState.jugador.c++;
+			newState.jugador.f--;
+			break;
+		case 2:
+			newState.jugador.c++;
+			break;
+		case 3:
+			newState.jugador.c++;
+			newState.jugador.f++;
+			break;
+		case 4:
+			newState.jugador.f++;
+			break;
+		case 5:
+			newState.jugador.c--;
+			newState.jugador.f++;
+			break;
+		case 6:
+			newState.jugador.c--;
+			break;
+		case 7:
+			newState.jugador.c--;
+			newState.jugador.f--;
+			break;
+		}
+		break;
+	case actRUN:
+		switch (newState.jugador.brujula)
+		{
+		case 0:
+			newState.jugador.f -= 2;
+			break;
+		case 1:
+			newState.jugador.c += 2;
+			newState.jugador.f -= 2;
+			break;
+		case 2:
+			newState.jugador.c += 2;
+			break;
+		case 3:
+			newState.jugador.c += 2;
+			newState.jugador.f += 2;
+			break;
+		case 4:
+			newState.jugador.f += 2;
+			break;
+		case 5:
+			newState.jugador.c -= 2;
+			newState.jugador.f += 2;
+			break;
+		case 6:
+			newState.jugador.c -= 2;
+			break;
+		case 7:
+			newState.jugador.c -= 2;
+			newState.jugador.f -= 2;
+			break;
+		}
 		break;
 	case actTURN_SR:
 		newState.jugador.brujula = (Orientacion)((newState.jugador.brujula + 1) % 8);
@@ -556,8 +571,13 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 	default:
 		throw("Acción no reconocida");
 	}
+
+	if (accion == actRUN && ((applyAction(st, actWALK, sensores) == st) || !casillaTransitable(newState.jugador)))
+		newState = st;
+	else if (accion == actWALK && !casillaTransitable(newState.jugador))
+		newState = st;
 	if (newState.jugador.f == sensores.CLBposF && newState.jugador.c == sensores.CLBposC)
-		return st;
+		newState = st;
 
 	if (mapaResultado[newState.jugador.f][newState.jugador.c] == 'K')
 	{
@@ -870,12 +890,10 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 				nodeJugador child_run = currentNode;
 				child_run.coste += calculoCoste(child_run.st, actRUN);
 				child_run.st = applyAction(child_run.st, actRUN, sensores);
+				child_run.secuencia.push_back(actRUN);
 
 				if (!(child_run == currentNode) && child_run.coste <= sensores.bateria && (explored.find(child_run) == explored.end()))
-				{
-					child_run.secuencia.push_back(actRUN);
 					frontier.push(child_run);
-				}
 				if (!solutionFound)
 				{
 					nodeJugador child_turn_sr = currentNode, child_turn_l = currentNode;
