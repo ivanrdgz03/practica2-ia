@@ -833,8 +833,8 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 	nodeJugador currentNode;
 	currentNode.st = inicio;
 	currentNode.coste = 0;
-	priority_queue<nodeJugador, vector<nodeJugador>, functorJugador> frontier;
-	set<nodeJugador> explored;
+	priority_queue<nodeJugador, vector<nodeJugador>> frontier;
+	set<stateJugador> explored;
 	bool solutionFound = (currentNode.st.jugador.f == final.f && currentNode.st.jugador.c == final.c);
 
 	frontier.push(currentNode);
@@ -842,7 +842,7 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 	while (!frontier.empty() && !solutionFound)
 	{
 		frontier.pop();
-		explored.insert(currentNode);
+		explored.insert(currentNode.st);
 		if (currentNode.st.jugador.f == final.f && currentNode.st.jugador.c == final.c)
 		{
 			solutionFound = true;
@@ -859,7 +859,7 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 				solutionFound = true;
 			}
 			else*/
-			if (!(child_walk == currentNode) && child_walk.coste <= sensores.bateria && (explored.find(child_walk) == explored.end()))
+			if (!(child_walk == currentNode) && child_walk.coste <= sensores.bateria && (explored.find(child_walk.st) == explored.end()))
 			{
 				child_walk.secuencia.push_back(actWALK);
 				frontier.push(child_walk);
@@ -871,7 +871,7 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 				child_run.coste += calculoCoste(child_run.st, actRUN);
 				child_run.st = applyAction(child_run.st, actRUN, sensores);
 
-				if (!(child_run == currentNode) && child_run.coste <= sensores.bateria && (explored.find(child_run) == explored.end()))
+				if (!(child_run == currentNode) && child_run.coste <= sensores.bateria && (explored.find(child_run.st) == explored.end()))
 				{
 					child_run.secuencia.push_back(actRUN);
 					frontier.push(child_run);
@@ -882,7 +882,7 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 					child_turn_sr.coste += calculoCoste(child_turn_sr.st, actTURN_SR);
 					child_turn_sr.st = applyAction(child_turn_sr.st, actTURN_SR, sensores);
 
-					if (explored.find(child_turn_sr) == explored.end() && child_turn_sr.coste <= sensores.bateria)
+					if (explored.find(child_turn_sr.st) == explored.end() && child_turn_sr.coste <= sensores.bateria)
 					{
 						child_turn_sr.secuencia.push_back(actTURN_SR);
 						frontier.push(child_turn_sr);
@@ -891,7 +891,7 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 					child_turn_l.coste += calculoCoste(child_turn_l.st, actTURN_L);
 					child_turn_l.st = applyAction(child_turn_l.st, actTURN_L, sensores);
 
-					if (explored.find(child_turn_l) == explored.end() && child_turn_l.coste <= sensores.bateria)
+					if (explored.find(child_turn_l.st) == explored.end() && child_turn_l.coste <= sensores.bateria)
 					{
 						child_turn_l.secuencia.push_back(actTURN_L);
 						frontier.push(child_turn_l);
@@ -902,8 +902,8 @@ bool ComportamientoJugador::busquedaN2(const stateJugador &inicio, const ubicaci
 		if (!solutionFound && !frontier.empty())
 		{
 			currentNode = frontier.top();
-			set<nodeJugador>::iterator it;
-			while (!frontier.empty() && ((it = explored.find(currentNode)) != explored.end()))
+
+			while (!frontier.empty() && (explored.find(currentNode.st) != explored.end()))
 			{
 				frontier.pop();
 				if (!frontier.empty())
