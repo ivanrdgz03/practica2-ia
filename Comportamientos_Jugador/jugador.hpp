@@ -229,6 +229,7 @@ private:
   state applyAction(const state &state, const Action &accion) const;
   bool busquedaN0(const stateJugador &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores& sensores);
   Action nivel0(const Sensores &sensores);
+  ubicacion nextCasilla(const ubicacion& u) const;
 
   ubicacion obtener_coordenadas(const ubicacion &u, const unsigned int &pos) const;
   bool colaboradorEnSensor(const state &st, const Sensores &sensores) const;

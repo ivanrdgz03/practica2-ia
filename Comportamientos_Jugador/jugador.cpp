@@ -488,6 +488,42 @@ state ComportamientoJugador::applyAction(const state &st, const Action &accion) 
 	return newState;
 }
 
+ubicacion ComportamientoJugador::nextCasilla(const ubicacion& u) const{
+	ubicacion salida = u;
+	switch (salida.brujula)
+		{
+		case 0:
+			salida.f--;
+			break;
+		case 1:
+			salida.c++;
+			salida.f--;
+			break;
+		case 2:
+			salida.c++;
+			break;
+		case 3:
+			salida.c++;
+			salida.f++;
+			break;
+		case 4:
+			salida.f++;
+			break;
+		case 5:
+			salida.c--;
+			salida.f++;
+			break;
+		case 6:
+			salida.c--;
+			break;
+		case 7:
+			salida.c--;
+			salida.f--;
+			break;
+		}
+	return salida;
+}
+
 stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Action &accion, const Sensores &sensores) const
 {
 	stateJugador newState = st;
@@ -495,75 +531,17 @@ stateJugador ComportamientoJugador::applyAction(const stateJugador &st, const Ac
 	switch (accion)
 	{
 	case actRUN:
-		switch (newState.jugador.brujula)
-		{
-		case 0:
-			newState.jugador.f--;
-			break;
-		case 1:
-			newState.jugador.c++;
-			newState.jugador.f--;
-			break;
-		case 2:
-			newState.jugador.c++;
-			break;
-		case 3:
-			newState.jugador.c++;
-			newState.jugador.f++;
-			break;
-		case 4:
-			newState.jugador.f++;
-			break;
-		case 5:
-			newState.jugador.c--;
-			newState.jugador.f++;
-			break;
-		case 6:
-			newState.jugador.c--;
-			break;
-		case 7:
-			newState.jugador.c--;
-			newState.jugador.f--;
-			break;
-		}
+		newState.jugador = nextCasilla(newState.jugador);
 		if(!casillaTransitable(newState.jugador))
 			return st;
-		
+		newState.jugador = nextCasilla(newState.jugador);
+		if(!casillaTransitable(newState.jugador))
+			return st;
+		break;
 	case actWALK:
-		switch (newState.jugador.brujula)
-		{
-		case 0:
-			newState.jugador.f--;
-			break;
-		case 1:
-			newState.jugador.c++;
-			newState.jugador.f--;
-			break;
-		case 2:
-			newState.jugador.c++;
-			break;
-		case 3:
-			newState.jugador.c++;
-			newState.jugador.f++;
-			break;
-		case 4:
-			newState.jugador.f++;
-			break;
-		case 5:
-			newState.jugador.c--;
-			newState.jugador.f++;
-			break;
-		case 6:
-			newState.jugador.c--;
-			break;
-		case 7:
-			newState.jugador.c--;
-			newState.jugador.f--;
-			break;
-		}
+		newState.jugador = nextCasilla(newState.jugador);
 		if(!casillaTransitable(newState.jugador))
 			return st;
-		
 		break;
 	case actTURN_SR:
 		newState.jugador.brujula = (Orientacion)((newState.jugador.brujula + 1) % 8);
