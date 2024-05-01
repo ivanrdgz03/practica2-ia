@@ -9,7 +9,7 @@
 #include <set>
 #include <iostream>
 #include <cmath>
-#include <stack>
+#include "motorlib/util.h"
 
 struct objetos
 {
@@ -68,23 +68,17 @@ struct node
 {
   state st;
   unsigned int coste;
+  unsigned int heuristica;
   list<Action> secuencia;
 
   bool operator==(const node &other) const
   {
     return (st == other.st);
   }
-  node operator=(const node &other)
-  {
-    st = other.st;
-    coste = other.coste;
-    secuencia = other.secuencia;
-    return *this;
-  }
 
   bool operator<(const node &other) const
   {
-    return (st < other.st);
+    return ((coste + heuristica) > (other.coste + other.heuristica));
   }
 };
 struct functor
@@ -95,7 +89,12 @@ struct functor
   functor(const Sensores& sensores): sensores(sensores){}
   bool operator()(const node &a, const node &b) const
   {
-    return ((a.coste+abs(a.st.colaborador.f - sensores.destinoF + a.st.colaborador.c - sensores.destinoC)) > (b.coste + abs(b.st.colaborador.f - sensores.destinoF + b.st.colaborador.c - sensores.destinoC)));
+    if(a.coste > b.coste)
+      return true;
+    else if(a.coste == b.coste && ((abs(a.st.colaborador.f - sensores.destinoF) + abs(a.st.colaborador.c - sensores.destinoC)) > (abs(b.st.colaborador.f - sensores.destinoF) + abs(b.st.colaborador.c - sensores.destinoC))))
+      return true;
+    else
+      return false;
   }
 };
 
@@ -132,24 +131,10 @@ struct nodeJugador
   {
     return (st == other.st);
   }
-  nodeJugador operator=(const nodeJugador &other)
-  {
-    st = other.st;
-    coste = other.coste;
-    secuencia = other.secuencia;
-    return *this;
-  }
 
   bool operator<(const nodeJugador &other) const
   {
     return (coste > other.coste);
-  }
-};
-struct functorJugador
-{
-  bool operator()(const nodeJugador &a, const nodeJugador &b) const
-  {
-    return (a.coste > b.coste);
   }
 };
 
@@ -222,14 +207,12 @@ private:
   node current_state;
   nodeJugador current_state_jugador;
 
-  bool Find(const node &nodo, const set<node> &lista) const;
   void visualizarPlan(const state &st, const list<Action> &plan);
   void reseteoMatriz(vector<vector<unsigned char>> &matriz);
   bool casillaTransitable(const ubicacion &u) const;
   state applyAction(const state &state, const Action &accion) const;
   bool busquedaN0(const stateJugador &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores& sensores);
   Action nivel0(const Sensores &sensores);
-  ubicacion nextCasilla(const ubicacion& u) const;
 
   ubicacion obtener_coordenadas(const ubicacion &u, const unsigned int &pos) const;
   bool colaboradorEnSensor(const state &st, const Sensores &sensores) const;
@@ -243,11 +226,10 @@ private:
       stateJugador applyAction(const stateJugador &st, const Action &accion, const Sensores& sensores) const;
   void visualizarPlan(const stateJugador &st, const list<Action> &plan, const Sensores& sensores);
 
-
-
   bool busquedaN3(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
   Action nivel3(const Sensores &sensores);
 ubicacion NextCasilla(const ubicacion &pos) const;
+unsigned int calcularHeuristica(const state& st, const ubicacion &destino, const Sensores& sensores) const;
 };
 
 #endif
