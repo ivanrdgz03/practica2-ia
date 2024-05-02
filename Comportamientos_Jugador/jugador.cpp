@@ -626,16 +626,6 @@ bool ComportamientoJugador::busquedaN1(const state &inicio, const ubicacion &fin
 					child_colab_turn.secuencia.push_back(act_CLB_TURN_SR);
 					frontier.push_back(child_colab_turn);
 				}
-				if (currentNode.st.ultimaAccionColaborador != act_CLB_STOP)
-				{
-					node child_colab_stop = currentNode;
-					child_colab_stop.st = applyAction(currentNode.st, act_CLB_STOP);
-					if (explored.find(child_colab_stop.st) == explored.end())
-					{
-						child_colab_stop.secuencia.push_back(act_CLB_STOP);
-						frontier.push_back(child_colab_stop);
-					}
-				}
 			}
 		}
 		if (!solutionFound)
