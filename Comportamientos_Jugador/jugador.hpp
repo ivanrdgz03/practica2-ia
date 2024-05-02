@@ -59,6 +59,8 @@ struct state
       return true;
     else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && colaborador.f == other.colaborador.f && colaborador.c == other.colaborador.c && colaborador.brujula == other.colaborador.brujula && objetos_jugador == other.objetos_jugador && objetos_colaborador < other.objetos_colaborador)
       return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && colaborador.f == other.colaborador.f && colaborador.c == other.colaborador.c && colaborador.brujula == other.colaborador.brujula && objetos_jugador == other.objetos_jugador && objetos_colaborador == other.objetos_colaborador && ultimaAccionColaborador < other.ultimaAccionColaborador)
+      return true;
     else
       return false;
   }
