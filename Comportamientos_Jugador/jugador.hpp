@@ -42,7 +42,8 @@ struct state
   {
     return (jugador == other.jugador && colaborador == other.colaborador && objetos_colaborador == other.objetos_colaborador && objetos_jugador == other.objetos_jugador);
   }
-  bool operator<(const state &other) const{
+  bool operator<(const state &other) const
+  {
     if (jugador.f < other.jugador.f)
       return true;
     else if (jugador.f == other.jugador.f && jugador.c < other.jugador.c)
@@ -85,15 +86,16 @@ struct node
 };
 struct functor
 {
-  private:
-    Sensores sensores;
-  public:
-  functor(const Sensores& sensores): sensores(sensores){}
+private:
+  Sensores sensores;
+
+public:
+  functor(const Sensores &sensores) : sensores(sensores) {}
   bool operator()(const node &a, const node &b) const
   {
-    if(a.coste > b.coste)
+    if (a.coste > b.coste)
       return true;
-    else if(a.coste == b.coste && ((abs(a.st.colaborador.f - sensores.destinoF) + abs(a.st.colaborador.c - sensores.destinoC)) > (abs(b.st.colaborador.f - sensores.destinoF) + abs(b.st.colaborador.c - sensores.destinoC))))
+    else if (a.coste == b.coste && ((abs(a.st.colaborador.f - sensores.destinoF) + abs(a.st.colaborador.c - sensores.destinoC)) > (abs(b.st.colaborador.f - sensores.destinoF) + abs(b.st.colaborador.c - sensores.destinoC))))
       return true;
     else
       return false;
@@ -109,14 +111,15 @@ struct stateJugador
   {
     return (jugador == other.jugador && objetos_jugador == other.objetos_jugador);
   }
-  bool operator<(const stateJugador &other) const{
+  bool operator<(const stateJugador &other) const
+  {
     if (jugador.f < other.jugador.f)
       return true;
     else if (jugador.f == other.jugador.f && jugador.c < other.jugador.c)
       return true;
     else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula < other.jugador.brujula)
       return true;
-    else if(jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && objetos_jugador < other.objetos_jugador)
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && objetos_jugador < other.objetos_jugador)
       return true;
     else
       return false;
@@ -145,7 +148,21 @@ class ComportamientoJugador : public Comportamiento
 public:
   ComportamientoJugador(unsigned int size) : Comportamiento(size)
   {
-    // Constructor nivel 4???
+    hayPlan = false;
+    lastAction = actIDLE;
+    bien_situado = false;
+    current_state.st.jugador = {0, 0};
+    current_state.st.colaborador = {0, 0};
+    current_state.st.ultimaAccionColaborador = act_CLB_STOP;
+    current_state.secuencia.clear();
+    current_state.coste = 0;
+    current_state.st.objetos_jugador = {false, false};
+    current_state.st.objetos_colaborador = {false, false};
+
+    current_state_jugador.st.jugador = {0, 0};
+    current_state_jugador.st.objetos_jugador = {false, false};
+    current_state_jugador.secuencia.clear();
+    current_state_jugador.coste = 0;
   }
   ComportamientoJugador(std::vector<std::vector<unsigned char>> mapaR) : Comportamiento(mapaR)
   {
@@ -204,16 +221,17 @@ private:
                                                    {-1, 3},
                                                    {0, 3}};
 
-  bool hayPlan;
+  bool hayPlan, bien_situado;
   list<Action> plan;
   node current_state;
   nodeJugador current_state_jugador;
+  Action lastAction;
 
   void visualizarPlan(const state &st, const list<Action> &plan);
   void reseteoMatriz(vector<vector<unsigned char>> &matriz);
   bool casillaTransitable(const ubicacion &u) const;
   state applyAction(const state &state, const Action &accion) const;
-  bool busquedaN0(const stateJugador &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores& sensores);
+  bool busquedaN0(const stateJugador &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
   Action nivel0(const Sensores &sensores);
 
   ubicacion obtener_coordenadas(const ubicacion &u, const unsigned int &pos) const;
@@ -224,14 +242,21 @@ private:
   Action nivel2(const Sensores &sensores);
   bool busquedaN2(const stateJugador &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
   unsigned int calculoCoste(const state &st, const Action &accion) const;
-    unsigned int calculoCoste(const stateJugador &st, const Action &accion) const;
-      stateJugador applyAction(const stateJugador &st, const Action &accion, const Sensores& sensores) const;
-  void visualizarPlan(const stateJugador &st, const list<Action> &plan, const Sensores& sensores);
+  unsigned int calculoCoste(const stateJugador &st, const Action &accion) const;
+  stateJugador applyAction(const stateJugador &st, const Action &accion, const Sensores &sensores) const;
+  void visualizarPlan(const stateJugador &st, const list<Action> &plan, const Sensores &sensores);
 
   bool busquedaN3(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
   Action nivel3(const Sensores &sensores);
-ubicacion NextCasilla(const ubicacion &pos) const;
-unsigned int calcularHeuristica(const state& st, const ubicacion &destino, const Sensores& sensores) const;
+  ubicacion NextCasilla(const ubicacion &pos) const;
+  unsigned int calcularHeuristica(const state &st, const ubicacion &destino, const Sensores &sensores) const;
+
+  Action nivel4(const Sensores &sensores);
+  bool busquedaN4(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
+  void guardar_mapa(const Sensores &sensores, vector<vector<unsigned char>> &mapa);
+  pair<unsigned int, unsigned int> obtener_coordenadas(const unsigned int &pos) const;
+  bool personajesSinColisionar(const state& st, const state& inicio, const Sensores& sensores, const vector<vector<unsigned char>>& mapa) const;
+
 };
 
 #endif
