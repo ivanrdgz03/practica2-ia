@@ -1421,14 +1421,15 @@ Action ComportamientoJugador::nivel4(const Sensores &sensores)
 	}
 	else if (condicion_recarga && mov_sin_recarga > 200)
 	{
-		bool encontrado = false;
-		for (int i = 0; i < mapaResultado.size() && !encontrado; i++)
-			for (int j = 0; j < mapaResultado[0].size() && !encontrado; j++)
-				if (mapaResultado[i][j] == 'X')
+		ubicacion aux;
+		for (int i = 0; i < mapaResultado.size(); i++)
+			for (int j = 0; j < mapaResultado[0].size(); j++)
+				if (mapaResultado[i][j] == 'X' && abs(i-current_state4.st.jugador.f+j-current_state4.st.jugador.c)<abs(aux.f-current_state4.st.jugador.f+aux.c-current_state4.st.jugador.c))
 				{
-					encontrado = true;
-					busquedaN4(current_state4.st, {i, j}, mapaResultado, sensores, colab);
+					aux.f = i;
+    aux.c= j;
 				}
+busquedaN4(current_state4.st, {aux.f, aux.c}, mapaResultado, sensores, colab);
 	}else mov_sin_recarga++;
 	
 	if(plan.empty())
