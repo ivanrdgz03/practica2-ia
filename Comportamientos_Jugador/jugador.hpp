@@ -84,23 +84,6 @@ struct node
     return ((coste + heuristica) > (other.coste + other.heuristica));
   }
 };
-struct functor
-{
-private:
-  Sensores sensores;
-
-public:
-  functor(const Sensores &sensores) : sensores(sensores) {}
-  bool operator()(const node &a, const node &b) const
-  {
-    if (a.coste > b.coste)
-      return true;
-    else if (a.coste == b.coste && ((abs(a.st.colaborador.f - sensores.destinoF) + abs(a.st.colaborador.c - sensores.destinoC)) > (abs(b.st.colaborador.f - sensores.destinoF) + abs(b.st.colaborador.c - sensores.destinoC))))
-      return true;
-    else
-      return false;
-  }
-};
 
 struct stateJugador
 {
@@ -143,6 +126,48 @@ struct nodeJugador
   }
 };
 
+struct stateJugador4
+{
+  ubicacion jugador;
+  objetos objetos_jugador;
+
+  bool operator==(const stateJugador4 &other) const
+  {
+    return (jugador == other.jugador && objetos_jugador == other.objetos_jugador);
+  }
+  bool operator<(const stateJugador4 &other) const
+  {
+    if (jugador.f < other.jugador.f)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c < other.jugador.c)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula < other.jugador.brujula)
+      return true;
+    else if (jugador.f == other.jugador.f && jugador.c == other.jugador.c && jugador.brujula == other.jugador.brujula && objetos_jugador < other.objetos_jugador)
+      return true;
+    else
+      return false;
+  }
+};
+
+struct nodeJugador4
+{
+  stateJugador4 st;
+  unsigned int coste;
+  unsigned int heuristica;
+  list<Action> secuencia;
+
+  bool operator==(const nodeJugador4 &other) const
+  {
+    return (st == other.st);
+  }
+
+  bool operator<(const nodeJugador4 &other) const
+  {
+    return ((coste + heuristica) > (other.coste + other.heuristica));
+  }
+};
+
 class ComportamientoJugador : public Comportamiento
 {
 public:
@@ -163,6 +188,14 @@ public:
     current_state_jugador.st.objetos_jugador = {false, false};
     current_state_jugador.secuencia.clear();
     current_state_jugador.coste = 0;
+
+    current_state4.st.jugador = {0, 0};
+    current_state4.st.objetos_jugador = {false, false};
+    current_state4.secuencia.clear();
+    current_state4.coste = 0;
+    current_state4.heuristica = 0;
+    colab = {0, 0};
+    mov_sin_recarga = 0;
   }
   ComportamientoJugador(std::vector<std::vector<unsigned char>> mapaR) : Comportamiento(mapaR)
   {
@@ -224,7 +257,10 @@ private:
   bool hayPlan, bien_situado;
   list<Action> plan;
   node current_state;
+  unsigned int mov_sin_recarga = 0;
+  ubicacion colab;
   nodeJugador current_state_jugador;
+  nodeJugador4 current_state4;
   Action lastAction;
 
   void visualizarPlan(const state &st, const list<Action> &plan);
@@ -249,14 +285,15 @@ private:
   bool busquedaN3(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
   Action nivel3(const Sensores &sensores);
   ubicacion NextCasilla(const ubicacion &pos) const;
-  unsigned int calcularHeuristica(const state &st, const ubicacion &destino, const Sensores &sensores) const;
+  unsigned int calcularHeuristica(const ubicacion &actual, const ubicacion &destino, const Sensores &sensores) const;
 
   Action nivel4(const Sensores &sensores);
-  bool busquedaN4(const state &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores);
+  bool busquedaN4(const stateJugador4 &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores, const ubicacion& colab);
   void guardar_mapa(const Sensores &sensores, vector<vector<unsigned char>> &mapa);
   pair<unsigned int, unsigned int> obtener_coordenadas(const unsigned int &pos) const;
-  bool personajesSinColisionar(const state& st, const state& inicio, const Sensores& sensores, const vector<vector<unsigned char>>& mapa) const;
-
+  bool personajesSinColisionar(const state &st, const state &inicio, const Sensores &sensores, const vector<vector<unsigned char>> &mapa) const;
+  unsigned int calculoCoste(const stateJugador4 &st, const Action &accion) const;
+  stateJugador4 applyAction(const stateJugador4 &st, const Action &accion, const ubicacion& colab) const;
 };
 
 #endif
