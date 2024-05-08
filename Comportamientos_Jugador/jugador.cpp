@@ -540,6 +540,8 @@ stateJugador4 ComportamientoJugador::applyAction(const stateJugador4 &st, const 
 {
 	stateJugador4 newState = st;
 	ubicacion aux, aux2;
+	if (colab.f != 12 && colab.c != 12)
+		cout << "hola";
 	switch (accion)
 	{
 	case actWALK:
@@ -1411,7 +1413,7 @@ Action ComportamientoJugador::nivel4(const Sensores &sensores)
 			current_state4.st.objetos_jugador.bikini = false;
 		}
 	}
-	bool condicion_recarga = ((sensores.bateria < 3000 && sensores.vida > 1600) || sensores.bateria < 1200);
+	bool condicion_recarga = ((sensores.bateria < 3000 && sensores.vida > 1500) || sensores.bateria < 1000);
 	plan.clear();
 	if (mapaResultado[current_state4.st.jugador.f][current_state4.st.jugador.c] == 'X' && condicion_recarga){
 		mov_sin_recarga = 0;

@@ -288,12 +288,12 @@ private:
   unsigned int calcularHeuristica(const ubicacion &actual, const ubicacion &destino, const Sensores &sensores) const;
 
   Action nivel4(const Sensores &sensores);
-  bool busquedaN4(const stateJugador4 &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores, const ubicacion& colab);
+  bool busquedaN4(const stateJugador4 &inicio, const ubicacion &final, const vector<vector<unsigned char>> &mapa, const Sensores &sensores, const ubicacion &colab);
   void guardar_mapa(const Sensores &sensores, vector<vector<unsigned char>> &mapa);
   pair<unsigned int, unsigned int> obtener_coordenadas(const unsigned int &pos) const;
   bool personajesSinColisionar(const state &st, const state &inicio, const Sensores &sensores, const vector<vector<unsigned char>> &mapa) const;
   unsigned int calculoCoste(const stateJugador4 &st, const Action &accion) const;
-  stateJugador4 applyAction(const stateJugador4 &st, const Action &accion, const ubicacion& colab) const;
+  stateJugador4 applyAction(const stateJugador4 &st, const Action &accion, const ubicacion &colab) const;
 };
 
 #endif
