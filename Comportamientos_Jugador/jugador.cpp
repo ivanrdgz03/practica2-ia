@@ -540,8 +540,7 @@ stateJugador4 ComportamientoJugador::applyAction(const stateJugador4 &st, const 
 {
 	stateJugador4 newState = st;
 	ubicacion aux, aux2;
-	if (colab.f != 12 && colab.c != 12)
-		cout << "hola";
+
 	switch (accion)
 	{
 	case actWALK:

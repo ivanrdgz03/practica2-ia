@@ -81,7 +81,7 @@ struct node
 
   bool operator<(const node &other) const
   {
-    return ((coste + heuristica) > (other.coste + other.heuristica));
+    return ((coste + heuristica) > (other.coste + other.heuristica)||((coste + heuristica) == (other.coste + other.heuristica) && secuencia.size() > other.secuencia.size()));
   }
 };
 
